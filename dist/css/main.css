@@ -1,15 +1,21 @@
+.container {
+  max-width: 1280px;
+  padding: 0 1.5rem;
+  margin: auto;
+  overflow: hidden; }
+
 * {
   margin: 0;
   padding: 0; }
 
 body {
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   line-height: 1.6;
-  background: #fff; }
+  background: #f4f4f4; }
 
 a {
   text-decoration: none;
-  color: teal; }
+  color: #333; }
 
 ul {
   list-style: none; }
@@ -22,4 +28,50 @@ h4 {
 img {
   width: 100%; }
 
+#logo {
+  width: 70px;
+  height: 70px;
+  color: #fff;
+  text-transform: uppercase; }
+
+#main-nav {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem; }
+  #main-nav ul {
+    display: flex; }
+  #main-nav li {
+    padding: 1rem 1.5rem; }
+  #main-nav a {
+    text-decoration: none;
+    color: #fff;
+    text-transform: uppercase;
+    border-bottom: 3px transparent solid;
+    padding-bottom: 0.5rem;
+    transition: border-color 0.5s; }
+    #main-nav a:hover {
+      border-color: #ccc; }
+    #main-nav a.current {
+      border-color: #ffbc00; }
+
 /* Header */
+#header-home {
+  background-color: blue;
+  height: 50vh;
+  color: #fff; }
+
+#banner {
+  background-color: yellow;
+  height: 50vh; }
+
+#education {
+  background-color: green;
+  height: 50vh; }
+
+#experience {
+  background-color: red;
+  height: 50vh; }
+
+#hobby {
+  background-color: orange;
+  height: 50vh; }
