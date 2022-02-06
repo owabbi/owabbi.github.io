@@ -50,12 +50,15 @@ img {
     #header-home a.current {
       border-color: #ffbc00; }
 
-.logo {
-  color: #fff; }
+h1 {
+  text-align: center;
+  color: #fff;
+  border-bottom: 3px transparent solid;
+  border-color: #ffbc00; }
 
 /* Header */
 #banner {
-  background-color: yellow;
+  background: url("../img/showcase.jpg") no-repeat center right/cover;
   height: 50vh; }
 
 #education {
@@ -67,5 +70,5 @@ img {
   height: 50vh; }
 
 #hobby {
-  background-color: orange;
+  background-color: teal;
   height: 50vh; }
