@@ -28,38 +28,32 @@ h4 {
 img {
   width: 100%; }
 
-#logo {
-  width: 70px;
-  height: 70px;
-  color: #fff;
-  text-transform: uppercase; }
-
-#main-nav {
+#header-home {
   display: flex;
+  overflow: auto;
   justify-content: space-between;
-  padding-top: 1rem; }
-  #main-nav ul {
+  padding-top: 1rem;
+  background-color: #333; }
+  #header-home ul {
     display: flex; }
-  #main-nav li {
+  #header-home li {
     padding: 1rem 1.5rem; }
-  #main-nav a {
+  #header-home a {
     text-decoration: none;
     color: #fff;
     text-transform: uppercase;
     border-bottom: 3px transparent solid;
     padding-bottom: 0.5rem;
     transition: border-color 0.5s; }
-    #main-nav a:hover {
+    #header-home a:hover {
       border-color: #ccc; }
-    #main-nav a.current {
+    #header-home a.current {
       border-color: #ffbc00; }
 
-/* Header */
-#header-home {
-  background-color: blue;
-  height: 50vh;
+.logo {
   color: #fff; }
 
+/* Header */
 #banner {
   background-color: yellow;
   height: 50vh; }
