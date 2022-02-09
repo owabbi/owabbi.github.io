@@ -32,8 +32,9 @@ img {
   display: flex;
   overflow: auto;
   justify-content: space-between;
-  padding-top: 1rem;
-  background-color: #333; }
+  background-color: #333;
+  position: fixed;
+  width: 100%; }
   #header-home ul {
     display: flex; }
   #header-home li {
@@ -62,8 +63,81 @@ h1 {
   height: 50vh; }
 
 #education {
-  background-color: green;
-  height: 50vh; }
+  background: green;
+  color: #fff;
+  height: 100vh; }
+  #education ul {
+    background: green; }
+  #education li {
+    list-style: none;
+    position: relative;
+    width: 6px;
+    margin: 0 auto;
+    padding-top: 50px;
+    background: #fff; }
+    #education li div {
+      position: relative;
+      bottom: 0;
+      width: 400px;
+      padding: 1rem;
+      background: #333;
+      transition: all 0.5s ease-in-out;
+      visibility: hidden;
+      opacity: 0; }
+    #education li:nth-child(odd) div {
+      left: 40px;
+      transform: translate(200px, 0); }
+      #education li:nth-child(odd) div::before {
+        left: -15px;
+        border-width: 8px 16px 8px 0;
+        border-color: transparent #333 transparent transparent; }
+    #education li:nth-child(even) div {
+      left: -463px;
+      transform: translate(-200px, 0); }
+      #education li:nth-child(even) div::before {
+        right: -15px;
+        border-width: 8px 0 8px 16px;
+        border-color: transparent transparent transparent #333; }
+    #education li.show div {
+      transform: none;
+      visibility: visible;
+      opacity: 1; }
+    #education li::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 25px;
+      height: 25px;
+      background: #fff;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      transition: all 0.5s ease-in-out; }
+  #education div:before {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    width: 0;
+    height: 0;
+    border-style: solid; }
+
+@media (max-width: 900px) {
+  #education ul li div {
+    width: 250px; }
+  #education ul li:nth-child(even) div {
+    left: -284px; } }
+
+@media (max-width: 600px) {
+  #education ul li {
+    margin-left: 20px; }
+    #education ul li div {
+      width: calc(1000vw - 90px); }
+    #education ul li:nth-child(even) div {
+      left: 40px; }
+      #education ul li:nth-child(even) div::before {
+        left: -15px;
+        border-width: 8px 16px 8px 0;
+        border-color: transparent #333 transparent transparent; } }
 
 #experience {
   background-color: red;
