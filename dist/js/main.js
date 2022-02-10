@@ -1,5 +1,8 @@
 const items = document.querySelectorAll('#education li');
 
+const menucurrent = document.getElementsByClassName('current');
+const menuoption = document.getElementsByClassName('tab');
+
 const isInViewport = el => {
     const rect = el.getBoundingClientRect();
     return (
@@ -17,6 +20,16 @@ const run = () =>
             item.classList.add('show');
         }
     });
+
+function change() {
+    menucurrent[0].classList.remove('current');
+    this.classList.add('current');
+
+}
+
+for (let i = 0; i < menuoption.length; i++) {
+    menuoption[i].addEventListener('click', change, false);
+}
 
 // Events
 window.addEventListener('load', run);

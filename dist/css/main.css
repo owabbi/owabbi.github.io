@@ -61,7 +61,7 @@ h1 {
 /* Header */
 #banner {
   background: url("../img/showcase.jpg") no-repeat center right/cover;
-  height: 50vh; }
+  height: 100vh; }
 
 #education {
   background: green;
@@ -142,8 +142,8 @@ h1 {
 
 #experience {
   background-color: red;
-  height: 50vh; }
+  height: 100vh; }
 
 #hobby {
   background-color: teal;
-  height: 50vh; }
+  height: 100vh; }
