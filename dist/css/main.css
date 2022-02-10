@@ -132,7 +132,8 @@ h1 {
   #education ul li {
     margin-left: 20px; }
     #education ul li div {
-      width: calc(1000vw - 90px); }
+      word-wrap: break-word;
+      width: calc(350px); }
     #education ul li:nth-child(even) div {
       left: 40px; }
       #education ul li:nth-child(even) div::before {
