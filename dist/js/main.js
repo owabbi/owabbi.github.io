@@ -1,4 +1,4 @@
-const items = document.querySelectorAll('#education li');
+const items = document.querySelectorAll('#education li, #experience li');
 
 const menucurrent = document.getElementsByClassName('current');
 const menuoption = document.getElementsByClassName('tab');
