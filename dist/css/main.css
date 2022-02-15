@@ -116,7 +116,7 @@ h1 {
 
 @media (max-width: 1400px) {
   #education ul li {
-    margin-left: calc(33rem - 200px); }
+    margin-left: calc(33rem - 300px); }
     #education ul li div {
       width: 500px; } }
 
@@ -182,7 +182,7 @@ h1 {
 
 @media (max-width: 1400px) {
   #experience ul li {
-    margin-left: calc(33rem - 200px); }
+    margin-left: calc(33rem - 300px); }
     #experience ul li div {
       width: 500px; } }
 
