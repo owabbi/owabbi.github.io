@@ -73,35 +73,25 @@ h1 {
     list-style: none;
     position: relative;
     width: 6px;
-    margin: 0 auto;
+    margin-left: 33rem;
     padding-top: 50px;
     height: 16rem;
     background: darkgreen; }
     #education li div {
       position: absolute;
       bottom: 0;
-      width: 400px;
+      width: 600px;
       padding: 1rem;
       background: green;
       transition: all 0.5s ease-in-out;
       visibility: hidden;
-      opacity: 0; }
-    #education li:nth-child(odd) div {
-      left: 40px;
-      transform: translate(200px, 0); }
-      #education li:nth-child(odd) div::before {
+      opacity: 0;
+      left: 40px; }
+      #education li div::before {
         left: -15px;
         border-width: 8px 16px 8px 0;
         border-color: transparent green transparent transparent; }
-    #education li:nth-child(even) div {
-      left: -463px;
-      transform: translate(-200px, 0); }
-      #education li:nth-child(even) div::before {
-        right: -15px;
-        border-width: 8px 0 8px 16px;
-        border-color: transparent transparent transparent green; }
     #education li.show div {
-      transform: none;
       visibility: visible;
       opacity: 1; }
     #education li::after {
@@ -125,23 +115,20 @@ h1 {
     border-style: solid; }
 
 @media (max-width: 1400px) {
-  #education ul li div {
-    width: 200px; }
-  #education ul li:nth-child(even) div {
-    left: -284px; } }
-
-@media (max-width: 1000px) {
   #education ul li {
-    margin-left: 20px; }
+    margin-left: calc(33rem - 200px); }
     #education ul li div {
-      word-wrap: break-word;
-      width: 280px; }
-    #education ul li:nth-child(even) div {
-      left: 40px; }
-      #education ul li:nth-child(even) div::before {
-        left: -15px;
-        border-width: 8px 16px 8px 0;
-        border-color: transparent green transparent transparent; } }
+      width: 500px; } }
+
+@media (max-width: 950px) {
+  #education ul li {
+    margin-left: 50px; }
+    #education ul li div {
+      width: 400px; } }
+
+@media (max-width: 550px) {
+  #education ul li div {
+    width: 300px; } }
 
 #experience {
   height: 100vh;
@@ -153,35 +140,25 @@ h1 {
     list-style: none;
     position: relative;
     width: 6px;
-    margin: 0 auto;
+    margin-left: 33rem;
     padding-top: 50px;
     height: 16rem;
     background: darkorange; }
     #experience li div {
       position: absolute;
       bottom: 0;
-      width: 400px;
+      width: 600px;
       padding: 1rem;
       background: orange;
       transition: all 0.5s ease-in-out;
       visibility: hidden;
-      opacity: 0; }
-    #experience li:nth-child(odd) div {
-      left: 40px;
-      transform: translate(200px, 0); }
-      #experience li:nth-child(odd) div::before {
+      opacity: 0;
+      left: 40px; }
+      #experience li div::before {
         left: -15px;
         border-width: 8px 16px 8px 0;
         border-color: transparent orange transparent transparent; }
-    #experience li:nth-child(even) div {
-      left: -463px;
-      transform: translate(-200px, 0); }
-      #experience li:nth-child(even) div::before {
-        right: -15px;
-        border-width: 8px 0 8px 16px;
-        border-color: transparent transparent transparent orange; }
     #experience li.show div {
-      transform: none;
       visibility: visible;
       opacity: 1; }
     #experience li::after {
@@ -204,23 +181,20 @@ h1 {
     border-style: solid; }
 
 @media (max-width: 1400px) {
-  #experience ul li div {
-    width: 200px; }
-  #experience ul li:nth-child(even) div {
-    left: -284px; } }
-
-@media (max-width: 1000px) {
   #experience ul li {
-    margin-left: 20px; }
+    margin-left: calc(33rem - 200px); }
     #experience ul li div {
-      word-wrap: break-word;
-      width: 280px; }
-    #experience ul li:nth-child(even) div {
-      left: 40px; }
-      #experience ul li:nth-child(even) div::before {
-        left: -15px;
-        border-width: 8px 16px 8px 0;
-        border-color: transparent orange transparent transparent; } }
+      width: 500px; } }
+
+@media (max-width: 950px) {
+  #experience ul li {
+    margin-left: 50px; }
+    #experience ul li div {
+      width: 400px; } }
+
+@media (max-width: 550px) {
+  #experience ul li div {
+    width: 300px; } }
 
 #hobby {
   background-color: paleturquoise;
