@@ -79,7 +79,7 @@ h1 {
     background: darkgreen; }
     #education li div {
       position: absolute;
-      bottom: 0;
+      bottom: 25%;
       width: 600px;
       padding: 1rem;
       background: green;
@@ -99,7 +99,7 @@ h1 {
       z-index: 3;
       position: absolute;
       left: 50%;
-      bottom: 0;
+      bottom: 25%;
       width: 25px;
       height: 25px;
       background: darkgreen;
@@ -146,7 +146,7 @@ h1 {
     background: darkorange; }
     #experience li div {
       position: absolute;
-      bottom: 0;
+      bottom: 25%;
       width: 600px;
       padding: 1rem;
       background: orange;
@@ -165,7 +165,7 @@ h1 {
       content: '';
       position: absolute;
       left: 50%;
-      bottom: 0;
+      bottom: 25%;
       width: 25px;
       height: 25px;
       background: darkorange;
