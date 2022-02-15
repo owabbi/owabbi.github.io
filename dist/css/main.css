@@ -66,7 +66,7 @@ h1 {
 #education {
   background: green;
   color: #fff;
-  height: 100vh; }
+  height: auto; }
   #education ul {
     background: palegreen; }
   #education li {
@@ -131,7 +131,7 @@ h1 {
     width: 300px; } }
 
 #experience {
-  height: 100vh;
+  height: auto;
   background-color: orange;
   color: #333; }
   #experience ul {
