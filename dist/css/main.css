@@ -1,12 +1,10 @@
 .container {
-  max-width: 1280px;
-  padding: 0 1.5rem;
-  margin: auto;
-  overflow: hidden; }
+  max-width: 1280px; }
 
 * {
   margin: 0;
-  padding: 0; }
+  padding: 0;
+  box-sizing: border-box; }
 
 body {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
@@ -29,28 +27,49 @@ img {
   width: 100%; }
 
 #header-home {
-  display: flex;
-  overflow: auto;
-  justify-content: space-between;
+  background-color: #333;
+  text-align: center; }
+
+#main-nav {
   background-color: #333;
   position: fixed;
   width: 100%;
   z-index: 6; }
-  #header-home ul {
-    display: flex; }
-  #header-home li {
-    padding: 1rem 1.5rem; }
-  #header-home a {
-    text-decoration: none;
-    color: #fff;
-    text-transform: uppercase;
-    border-bottom: 3px transparent solid;
-    padding-bottom: 0.5rem;
-    transition: border-color 0.5s; }
-    #header-home a:hover {
-      border-color: #ccc; }
-    #header-home a.current {
-      border-color: #ffbc00; }
+  #main-nav ul {
+    list-style: none; }
+    #main-nav ul li {
+      color: #fff;
+      text-transform: uppercase;
+      display: inline-block;
+      padding: 1rem 1.5rem;
+      position: relative; }
+      #main-nav ul li ul {
+        display: none; }
+      #main-nav ul li:hover {
+        cursor: pointer;
+        background-color: #333; }
+        #main-nav ul li:hover ul {
+          display: block;
+          position: absolute;
+          left: 0;
+          width: 200px;
+          margin-top: 1rem;
+          background-color: #333; }
+          #main-nav ul li:hover ul li {
+            display: block; }
+            #main-nav ul li:hover ul li:hover {
+              color: inherit; }
+      #main-nav ul li a {
+        text-decoration: none;
+        color: #fff;
+        text-transform: uppercase;
+        border-bottom: 3px transparent solid;
+        padding-bottom: 0.5rem;
+        transition: border-color 0.5s; }
+        #main-nav ul li a:hover {
+          border-color: #ccc; }
+        #main-nav ul li a.current {
+          border-color: #ffbc00; }
 
 h1 {
   text-align: center;
@@ -195,6 +214,10 @@ h1 {
 @media (max-width: 550px) {
   #experience ul li div {
     width: 300px; } }
+
+#skills {
+  background-color: coral;
+  height: 100vh; }
 
 #hobby {
   background-color: paleturquoise;
