@@ -74,16 +74,20 @@ img {
         #main-nav ul li a.current {
           border-color: #ffbc00; }
 
-h1 {
-  text-align: center;
-  color: #fff;
-  border-bottom: 3px transparent solid;
-  border-color: #ffbc00; }
-
 /* Header */
 #banner {
   background: url("../img/showcase.jpg") no-repeat center right/cover;
   height: 100vh; }
+  #banner p {
+    font-size: xx-large;
+    text-align: center;
+    color: #fff;
+    z-index: 5;
+    padding-top: 500px; }
+
+@media only screen and (max-width: 600px) {
+  #banner p {
+    color: red; } }
 
 #education {
   background: green;
