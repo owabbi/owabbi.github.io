@@ -59,17 +59,36 @@ h4 {
             display: block; }
             #main-nav ul li:hover ul li:hover {
               color: inherit; }
-      #main-nav ul li a {
+      #main-nav ul li a,
+      #main-nav ul li p {
         text-decoration: none;
         color: #fff;
         text-transform: uppercase;
         border-bottom: 3px transparent solid;
         padding-bottom: 0.5rem;
         transition: border-color 0.5s; }
-        #main-nav ul li a:hover {
+        #main-nav ul li a:hover,
+        #main-nav ul li p:hover {
           border-color: #ccc; }
-        #main-nav ul li a.current {
+        #main-nav ul li a.current,
+        #main-nav ul li p.current {
           border-color: #ffbc00; }
+
+@media only screen and (max-width: 600px) {
+  #main-nav ul li {
+    border-bottom: 1px transparent solid;
+    border-color: #666;
+    display: block; }
+    #main-nav ul li:last-child {
+      border: 0; }
+    #main-nav ul li:hover ul {
+      position: relative;
+      height: 100%;
+      width: 100%; }
+      #main-nav ul li:hover ul li {
+        text-align: center;
+        padding: 1rem 1.5rem;
+        background-color: #555; } }
 
 /* Header */
 #banner {
