@@ -93,13 +93,19 @@ h4 {
 /* Header */
 #banner {
   background: url("../img/showcase.jpg") no-repeat center right/cover;
+  filter: grayscale(100%);
   height: 100vh; }
   #banner p {
+    filter: none;
     font-size: xx-large;
     text-align: center;
     color: #fff;
     z-index: 5;
     padding-top: 50vh; }
+
+#banner p::after {
+  content: "";
+  color: red; }
 
 @media only screen and (max-width: 600px) {
   #banner p {
@@ -109,134 +115,74 @@ h4 {
   #banner p {
     color: yellow; } }
 
-#education {
-  background: green;
-  color: #fff;
+#education,
+#experience {
   height: auto; }
-  #education ul {
-    background: palegreen; }
-  #education li {
+  #education li,
+  #experience li {
     list-style: none;
     position: relative;
     width: 6px;
-    margin-left: 33rem;
+    margin-left: 50%;
     padding-top: 50px;
     height: 16rem;
-    background: darkgreen; }
-    #education li div {
+    background: black; }
+    #education li div,
+    #experience li div {
       position: absolute;
       bottom: 25%;
-      width: 600px;
-      padding: 1rem;
-      background: green;
+      width: 400px;
       transition: all 0.5s ease-in-out;
       visibility: hidden;
       opacity: 0;
-      left: 40px; }
-      #education li div::before {
-        left: -15px;
-        border-width: 8px 16px 8px 0;
-        border-color: transparent green transparent transparent; }
-    #education li.show div {
+      transform: translate(-50%, 0);
+      border-radius: 10%;
+      border: 5px solid;
+      overflow: hidden; }
+      #education li div h3,
+      #experience li div h3 {
+        border-bottom: 5px solid;
+        border-color: black;
+        padding: 10px;
+        text-align: center;
+        text-transform: uppercase;
+        isolation: isolate;
+        z-index: 1; }
+      #education li div p,
+      #experience li div p {
+        height: 100%;
+        text-align: center;
+        padding: 10px; }
+    #education li.show div,
+    #experience li.show div {
       visibility: visible;
       opacity: 1; }
-    #education li::after {
-      content: '';
-      z-index: 3;
-      position: absolute;
-      left: 50%;
-      bottom: 25%;
-      width: 25px;
-      height: 25px;
-      background: darkgreen;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      transition: all 0.5s ease-in-out; }
-  #education div:before {
-    content: '';
-    position: absolute;
-    bottom: 5px;
-    width: 0;
-    height: 0;
-    border-style: solid; }
 
-@media (max-width: 1400px) {
-  #education ul li {
-    margin-left: calc(33rem - 300px); }
-    #education ul li div {
-      width: 500px; } }
+#education ul {
+  background: #888; }
+  #education ul li div h3 {
+    color: #ddd;
+    background-color: #555; }
+  #education ul li div p {
+    background-color: #ddd;
+    color: #555; }
 
-@media (max-width: 950px) {
-  #education ul li {
-    margin-left: 50px; }
-    #education ul li div {
-      width: 400px; } }
+#experience ul {
+  background: #444; }
+  #experience ul li div h3 {
+    color: #333;
+    background-color: #aaa; }
+  #experience ul li div p {
+    background-color: #333;
+    color: #aaa; }
 
 @media (max-width: 550px) {
   #education ul li div {
     width: 300px; } }
 
-#experience {
-  height: auto;
-  background-color: orange;
-  color: #333; }
-  #experience ul {
-    background: palegoldenrod; }
-  #experience li {
-    list-style: none;
-    position: relative;
-    width: 6px;
-    margin-left: 33rem;
-    padding-top: 50px;
-    height: 16rem;
-    background: darkorange; }
-    #experience li div {
-      position: absolute;
-      bottom: 25%;
-      width: 600px;
-      padding: 1rem;
-      background: orange;
-      transition: all 0.5s ease-in-out;
-      visibility: hidden;
-      opacity: 0;
-      left: 40px; }
-      #experience li div::before {
-        left: -15px;
-        border-width: 8px 16px 8px 0;
-        border-color: transparent orange transparent transparent; }
-    #experience li.show div {
-      visibility: visible;
-      opacity: 1; }
-    #experience li::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: 25%;
-      width: 25px;
-      height: 25px;
-      background: darkorange;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      transition: all 0.5s ease-in-out; }
-  #experience div:before {
-    content: '';
-    position: absolute;
-    bottom: 5px;
-    width: 0;
-    height: 0;
-    border-style: solid; }
-
-@media (max-width: 1400px) {
-  #experience ul li {
-    margin-left: calc(33rem - 300px); }
-    #experience ul li div {
-      width: 500px; } }
-
-@media (max-width: 950px) {
-  #experience ul li {
-    margin-left: 50px; }
-    #experience ul li div {
-      width: 400px; } }
+@media (max-width: 550px) {
+  #experience ul li div {
+    width: 300px; } }
 
 @media (max-width: 550px) {
   #experience ul li div {

@@ -31,7 +31,17 @@ for (let i = 0; i < menuoption.length; i++) {
     menuoption[i].addEventListener('click', change, false);
 }
 
-// Events
+var prevScrollpos = window.pageYOffset;
+window.onscroll = function() {
+        var currentScrollPos = window.pageYOffset;
+        if (prevScrollpos > currentScrollPos) {
+            document.getElementById("main-nav").style.top = "0";
+        } else {
+            document.getElementById("main-nav").style.top = "-50px";
+        }
+        prevScrollpos = currentScrollPos;
+    }
+    // Events
 window.addEventListener('load', run);
 window.addEventListener('resize', run);
 window.addEventListener('scroll', run);
