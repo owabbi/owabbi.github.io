@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body onload="StartGravity()">
 
     <canvas id="canvas" width="1000" height="500" style="border:1px solid #000000;">
         Your browser does not support the HTML canvas tag.
@@ -14,10 +14,22 @@
     <p id="coords">Not selected yet</p>
     <p id="number">No circles yet</p>
 
-    <button onclick="StartGravity()" id="startBtn">Start Gravity</button>
-    <button onclick="StopGravity()" id="stopBtn">Stop Gravity</button>
+    <button onclick="StartGravity()" id="startBtn">Start</button>
+    <button onclick="StopGravity()" id="stopBtn">Stop</button>
     <script src="script.js"></script>
 
+    <label for="GumBall">Switch to GravityBall</label>
+    <input type="checkbox" id="GumBall" onclick="SwitchToGumBall()">
+    <div id="showArrow">
+        <label for="Grid">Grid</label>
+        <input type="checkbox" id="Grid" onclick="ShowGrid()">
+    </div>
+
+    <div id="addGumBalls">
+        <label for="AddGumBallNbr">Add Particles</label>
+        <input type="number" id="AddGumBallNbr" min="0" max="100">
+        <button id="AddGumBallBtn" onclick="AddGumBalls()">Generate</button>
+    </div>
 
 
 

@@ -1,12 +1,24 @@
-*{
+* {
     margin: 0;
     padding: 0;
 }
 
-p{
-    text-align: center;
+
+body{
+    position: absolute;
+text-align: center;
 }
-#stopBtn
-{
+
+/* p {
+    text-align: center;
+} */
+
+#startBtn {
     display: none;
 }
+
+
+/* canvas {
+    background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
+    background-size: ;
+} */
