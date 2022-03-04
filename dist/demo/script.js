@@ -149,9 +149,9 @@ class Segment {
         // ctx.moveTo(this.sX, this.sY);
         // ctx.lineTo(this.tempoPoint.x, this.tempoPoint.y);
         // ctx.lineTo(this.eX, this.eY);
-        ctx.moveTo(this.sX, this.sY);
-        ctx.lineTo(this.sX + (this.normal.x * 100), this.sY + (100 * this.normal.y));
-        ctx.stroke();
+        // ctx.moveTo(this.sX, this.sY);
+        // ctx.lineTo(this.sX + (this.normal.x * 100), this.sY + (100 * this.normal.y));
+        // ctx.stroke();
     }
 
 }
@@ -283,7 +283,6 @@ class Particle {
 
             }
 
-
         }
     }
 
@@ -338,40 +337,6 @@ class GravityBall extends Particle {
         if (this.position.x < this.radius) {
             this.velocity.x *= this.restitution;
             this.position.x = this.radius;
-        }
-    }
-
-    checkCollisionSegment(segment) {
-        var dist = distToSegment(this.position, segment.startVector, segment.endVector);
-        if (dist <= this.radius) {
-
-            var normal = segment.normal;
-            var unitNormal = Vector.division(normal, normal.mag());
-
-            var d = 2 * this.velocity.dot(normal);
-            console.log(d);
-
-
-            this.velocity.x -= d * normal.x;
-            this.velocity.y -= d * normal.y;
-
-            var vectorSegmentunit = segment.unit;
-
-            var changedOrigin = Vector.substraction(this.position, segment.startVector);
-
-            var projectionFactor = changedOrigin.dot(segment.vector) / segment.vector.mag();
-            var projectionCoords = Vector.multiplication(vectorSegmentunit, projectionFactor);
-
-            var projected = Vector.addition(projectionCoords, segment.startVector);
-
-            var correction = Vector.multiplication(unitNormal, this.radius);
-
-            const newV = Vector.addition(projected, correction);
-
-            this.position = newV;
-
-
-
         }
     }
 
