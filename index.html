@@ -2,98 +2,200 @@
 <html>
 
 <head>
-    <title>
-        Welcome
-    </title>
-    <link rel="stylesheet" type="" href="dist/css/main.css">
+    <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://kit.fontawesome.com/1b9099bbaa.js" crossorigin="anonymous"></script>
+
 </head>
 
-
 <body>
-    <!-- Header-->
-    <header id="header-home">
-        <div class="container">
-            <nav id="main-nav">
-                <ul>
-                    <li>
-                        <p class="current">Home</p>
+    <!-- 
+Hello and welcome to the source code. Here you can find all the possible entries to find all elements.
+Please keep in mind that this is the first version of this website, it will most certainly be updated in the future.
 
-                        <ul>
-                            <li><a href="#education">Education</a></li>
-                            <li><a href="#experience">Experience</a></li>
-                            <li><a href="#skills">Skills</a></li>
-                            <li><a href="#hobby">Hobby</a></li>
-                        </ul>
-                    </li>
-
-                    <li><a href="works.html" class="tab">Works</a></li>
-                    <li><a href="contact.html" class="tab">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
+     -->
+    <header>
+        <h1>Welcome</h1>
+        <input type="text" name="Search" class="console" value="> " oninput="Search(this.value)">
     </header>
+
     <section>
-        <div id="banner">
-            <p>Welcome</p>
+        <div id="welcome" class="current part">
+            <h2>Welcome</h2>
+            <p>Here you can see my resume. But you need to search for the pages yourself<br> The main categories are already shown on the left, but some others are hidden.</p>
         </div>
 
-        <div id="education">
+        <div class="part" id="education">
+            <h2>Education</h2>
+            <div id="education-grid">
+                <div class="education-part">
+                    <h3>2013</h3>
+                    <p>Scientific Baccalaureat <br> Mathematics Speciality</p>
+                </div>
+                <div class="education-part">
+                    <h3>2013 - 2016</h3>
+                    <p>Preparatory Classes for entrance to "Grandes Écoles"<br> MPSI - PSI</p>
+                </div>
+                <div class="education-part">
+                    <h3>2016 - 2019</h3>
+                    <p>Engineering School
+                        <br> ENSIAME
+                        <br>Micro Mecatronics</p>
+                </div>
+            </div>
+        </div>
+        <div class="part" id="experience">
+            <h2>Experience</h2>
+            <div id="education-grid">
+                <div class="education-part">
+                    <h3>Sept 2017 - Jan 2018</h3>
+                    <p>Maysalward - Jordan <br> IOT and Arduino</p>
+                </div>
+                <div class="education-part">
+                    <h3>Feb - Aug 2019</h3>
+                    <p>Alstom - Belgium
+                        <br> R&D- Software & Hardware developpement
+                    </p>
+                </div>
+                <div class="education-part">
+                    <h3>Sept 2019 - currently</h3>
+                    <p>Alstom - Belgium
+                        <br>Middle developpement in C++
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="skills" class="part">
+            <h2>Skills</h2>
+            <div id="skillgrid">
+                <div class="skillelement">
+                    <h4>Language</h4><i class="fa-solid fa-book"></i>
+                    <p> > French <br> > English
+                        <br> > German</p>
+                </div>
+                <div class="skillelement">
+                    <h4>Programming</h4><i class="fa-solid fa-laptop-code"></i>
+                    <p> > C <br> > C++
+                        <br> > C# <br> > Python</p>
+                </div>
+                <div class="skillelement">
+                    <h4>Mobile developpement</h4><i class="fa-solid fa-mobile-screen-button"></i>
+                    <p> > Android Java <br> > Kotlin
+                        <br> </p>
+                </div>
+                <div class="skillelement">
+                    <h4>Electronics</h4><i class="fa-solid fa-microchip"></i>
+                    <p> > Arduino <br> > KiCAD
+                        <br> </p>
+                </div>
+                <div class="skillelement">
+                    <h4>Web Developpement</h4><i class="fa-solid fa-code"></i>
+                    <p> > HTML / CSS <br> > Javasript
+                        <br> </p>
+                </div>
+                <div class="skillelement">
+                    <h4>Game Developpement</h4><i class="fa-solid fa-gamepad"></i>
+                    <p> > Unity </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="hobbies" class="part">
+            <h2>Hobbies</h2>
+            <p>NONE <br>I hate having fun</p>
+        </div>
+
+        <div id="about" class="part">
+            <h2 onload="activate()">About me</h2>
+            <div id="about-grid">
+                <div id="image">
+                    <p>&&&&&&&&&&&&&&&&&&&&&&%**,..........................,,,(#%&&&&&&&&&&&&&&&&&&&&&&<br> &&&&&&&&&&&&&&&&&&&%#/,,...............................,,,(#&%&&&&&&&&&&&&&&&&&&
+                        <br> &&&&&&&&&&&&&&&&&#*,,.............................,............&&&&&&&&&&&&&&&&&
+                        <br> &&&&&&&&&&&&&&%#*,...,,.,,.............,..........,..........,*(#&&&&&&&&&&&&&&&
+                        <br> &&&&&&&&&&&&&%(*.,,,,.,,,.,...,................,,.....,,,,,,...,*(%%&&&&&&&&&&&&
+                        <br> &&&&&&&&&&&&#(*,,,,,,,,,,,**,,.,,,,,,,*...........,,,,,,***,,..,,**(%&&&&&&&&&&&
+                        <br> &&&&&&&&&&%(*,,....,,,*********///((((/////********,*///(((/,.,*,,,**%&&&&&&&&&&
+                        <br> &&&&&&&&&%(,,,.....,***///////((########(((((((/////(##%#%%#(*,.,*****(%&&&&&&&&
+                        <br> &&&&&&&&&%,.......*///////((((#######################%%%%%%%%#*..,*,***#&&&&&&&&
+                        <br> &&&&&&&&%/.......,*///(((((((####%%%%%%#########%%%%%%%%%%%%%%(,..******%&&&&&&&
+                        <br> &&&&&&&&%,........*//((((##########%%%%%%%%%%%%%%%%%%%%%%%%%%%(,..,**,*/%&&&&&&&
+                        <br> &&&&&&&&#.........*//((((((///(((((#############%%%%%%%%&&&%%%(,...,,**(&&&&&&&&
+                        <br> &&&&&&&&%,.......*///,,..........,,***/((((//*,,,,,*****//#%%%%*....,,,/%&&&&&&&
+                        <br> &&&&&&&&&#.......///,,******,,,,,,,,,*/((((**,,,,,**********/%%#......,#&&&&&&&&
+                        <br> &&&&&&&&&%*.....*(//**,.,........,,,,*(#%%%/,,..,....,//,/(((#%%*.....*#&&&&&&&&
+                        <br> &&&&&&&&&&*...../(//****,,,,,,*****,*/(#%%%#/**,,*,..***,*//(#%%#...../&&&&&&&&&
+                        <br> &&&&&&&&&&%,...*/(((((//**,,,,*****//((%%&%%#(/*******//(#%%%%%%%,...,%&&&&&&&&&
+                        <br> &&&&&&&&&&%/...*/((((((((///////(///((##%&&%%%##(///(((##%%%%%%%%*,.,#&&&&&&&&&&
+                        <br> &&&&&&&&&&&#*..*///(((((((((###((//((((#%%&%%%%%%%%%##%%%%%%%%%%#,./*%&&&&&&&&&&
+                        <br> &&&&&&&&&&&%*..,*///(((((((((((((((///((####%%%#%%%%%%%%%%%%%%%##,,((&&&&&&&&&&&
+                        <br> &&&%&%&%&%&%(/,,**////((((((((((/**,,,,**//..*(######%%%%%%#%###(*,##&&&&&&&&&&&
+                        <br> &%%%%%%%&%%%%(/**///////(((((((((//******//((%%%%######%%%%%####/##%%&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%#/***//////(/(((((((/*******//((#%%%%#####%%%%%%####&&%&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%////////((((//************////((#%%####%%%%%%##/(#%%&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%##*//////////*,,,,......,,,,,,,*///(######%%%%###%%%&&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%%(//////////***///***////((((((/,,*(##%###%%#(#%%%&&&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%%#(****/////(((///******///(##%%%%##########((%&&&&&&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%%%#/*******////////***,,**//(#######((((((#((%%&&&&&&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%%%%#*,*,*****//(((((((#((((#%%%####((((/((/#%%&&&&&&&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%%%%#**,,,,,,,**/***///(///((((###(((((((//#%%%&&&&&&&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%%%%%/**,..,,,,,,,*,,*********//////////*(#%%#%%&@&%&&&&&&&&&&&&&
+                        <br> %%%%%%%%%%%%%%%%%%#///***,..,,,,,,,,,,,,,,,,,**,******((#%%%(,*(%&@@&&&%&&&%&&&&
+                        <br> %%%%%%%%%%%%%%%%%#/*//****,,,...,,,.,,,,,,.,,,,,*,*//(###%%%%(*.,%&@@@@&&&&&&&&&
+                        <br> %%%%%%%%#%%%%%%%%%**********,,,,,,,,,....,,,,,**//(((###%%%%%#(/*#&&@@@@@///%%&&
+                        <br> %#%#/,,,%%%%%%%%%%(*************,,,,**,,******///(((####%%%%##(//%&@@@@@@%***//*
+                        <br> ,,,,,,,#%%%%%%%%%%#*************************////(((###########((%&&@@@@@@&******
+                        <br> ,,,,,,,%%%%%%%%%%%%#*/******************//////((((#############%&&&@@@@&@(******
+                        <br> ,,,,,,*&%%%%%%%%%%%%%//*******//*******////////((((#########(%&&&&&@@@@&@/*****/
+                        <br> ,,,.,,*&&&%%%%%%%%%%%%%////**********/****////((((((#######&&&&&&&@@@@&@@/**/***
+                        <br> ,,,,...#&&&&%%%%%%%%%&&&%//////*/**//////*///(((((######%&&&&&&&@@@@@&@@&*******
+                        <br> ,,.,.,..%&&&&&%%%%%%%%&&&&&%(/(///((////(////(((#####%&&&&&&&&@@@@@@@@@@&*******
+                        <br> ,,.,...../&&&&&&%%%%%%%%%&&&&&&#((//(((((((((((%&&#%&&&@@&&&&&@@@@@@@@@@%*******
+                        <br> ,,,,,,.....#&&&&&&%%%%%%%%%%&&%,/#%%&&&%/((((//*/,...............%@@@@@@(*******
+                        <br> ,,,,.,......*&&&&&&&%%%%/..............,,.,..,.,....................&@@@********
+                        <br> ,,,,,,**/****,.......................,.,,.,,,,.,,.,...............,,**/(##(//***
+                        <br><a href="https://manytools.org/hacker-tools/convert-images-to-ascii-art/">ASCII art generator for geeks! - Convert images/pictures to ASCII art online! (HTML/text)</a></p>
+                </div>
+                <p id="about-text">I am Omar WABBI, a software engineer that studied in Mecatronics. I like to start projects and I try my best to finish them. I really enjoy discovering new techologies.</p>
+            </div>
+        </div>
+
+        <div id="contact" class="part">
+            <h2>Contact me</h2>
+            <p>On LinkedIn :
+                <a href="https://www.linkedin.com/in/omar-w-262735212">linkedin.com/in/omar-w-262735212</a> <br>Email :
+                <a href="omar_wabbi@live.fr">omar_wabbi@live.fr</a>
+            </p>
+        </div>
+        <div id="projects" class="part">
+            <h2>Projects / Portfolio</h2>
+            <p>Here you can find the list of my previous projects. <br> To make this a little more fun, they will be described with hints so you can find them in the console.
+            </p>
             <ul>
-                <li>
-                    <div>
-                        <h3> 2013 : Bac S</h3>
-                        <p>Lycée Van Dongen - Spécialité Maths</p>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <h3> 2013 - 2016 : Prépa</h3>
-                        <p>2013 : MPSI Lycée Fénélon Paris
-                            <br/> 2014 - 2016 : PSI Lycée Raspail Paris
-                        </p>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <h3> 2016 - 2019 : école d'ingénieur</h3>
-                        <p>ENSIAME Valenciennes - Mécatronique <br/> Spécialité Micro Mécatronique</p>
-                    </div>
-                </li>
+                <li>- Biggest planet of the solar system</li>
             </ul>
         </div>
-        <div id="experience">
-            <ul>
-                <li>
-                    <div>
-                        <h3> 2017 : Stage</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <h3> 2019 : Stage 2</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <h3> 2019 : Alstom</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    </div>
-                </li>
-            </ul>
+        <div id="jupiter" class="part">
+            <h2>Jupiter2029</h2>
+            <p>A physics engine made in Javascript<br>Link available soon</p>
         </div>
-        </div>
-        <div id="skills">
-        </div>
-        <div id="hobby">
-            <i class="fa-solid fa-dumbbell fa-10x"></i>
-            <i class="fa-solid fa-code fa-10x"></i>
-        </div>
+
     </section>
-    <script src="dist/js/main.js"></script>
+    <aside>
+        <ul>
+            <li class="hidden-tab" id="tab-about" onclick="show(5)"> > About me</li>
+            <li onclick="show(1)"> > Education</li>
+
+            <li onclick="show(2)"> > Experience</li>
+            <li onclick="show(3)"> > Skills</li>
+            <li onclick="show(4)"> > Hobbies</li>
+            <li class="hidden-tab" id="tab-contact" onclick="show(6)"> > Contact</li>
+            <li onclick="show(7)"> > Projects</li>
+            <li class="hidden-tab" id="tab-jupiter" onclick="show(8)"> --> Jupiter</li>
+
+        </ul>
+    </aside>
+    <script src="script.js"></script>
 </body>
 
 </html>
