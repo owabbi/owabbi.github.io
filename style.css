@@ -52,17 +52,14 @@
         border-bottom: #41FF00 dashed 1px;
         margin-bottom: 5px;
     }
-
     /* About */
-    #about-grid
-    {
+    
+    #about-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-
     }
-
-    #about-text
-    {
+    
+    #about-text {
         width: 500px;
         margin-top: 10px;
     }
@@ -151,5 +148,8 @@
         }
         #image p {
             display: none;
+        }
+        #about-text {
+            width: 300px;
         }
     }
