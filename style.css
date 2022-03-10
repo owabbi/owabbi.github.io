@@ -152,4 +152,8 @@
         #about-text {
             width: 300px;
         }
+        li:hover {
+            background-color: #000000;
+            border: #41FF00 1px dashed;
+        }
     }
