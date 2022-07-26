@@ -134,6 +134,21 @@
     li:hover {
         border: #41FF00 dashed 1px;
     }
+
+
+    /* Button */
+    button {
+        padding: 5px;
+        margin-top: 10px;
+        background-color: #000000;
+        border: #41FF00 dashed 1px;
+        color: #41FF00;
+    }
+
+    button:hover {
+        background-color: #41FF00;
+        color: #000000;
+    }
     
     @media only screen and (max-width:600px) {
         body {

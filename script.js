@@ -118,3 +118,15 @@ function activate() {
     console.log("ACTIVATED");
 
 }
+
+function UnlockAll(params) {
+    console.log("Unlock all");
+    for (let index = 0; index < 9; index++) {
+        activateTab(index);
+    }
+}
+
+
+
+
+//Blank
