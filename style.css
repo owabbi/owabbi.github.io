@@ -3,7 +3,7 @@
         padding: 0;
         box-sizing: border-box;
     }
-    
+
     body {
         background-color: black;
         color: #41FF00;
@@ -11,19 +11,55 @@
         margin: auto;
         font-family: 'Courier New', Courier, monospace;
     }
-    
+
     a {
         text-decoration: none;
         color: #41FF00;
     }
-    
+
     header {
         text-align: center;
         border: 1px green solid;
         grid-row: 1;
         grid-column: 1 / 5;
     }
-    
+
+    #container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /*height: 100vh; */
+        /* Adjust the height of the container */
+    }
+
+    #grid-container {
+        display: grid;
+
+        text-align: center;
+        grid-template-columns: repeat(5, 20px);
+        /* Adjust the number and size of columns */
+    }
+
+    #grid-container div {
+        width: 20px;
+        /* Adjust the cell width */
+        height: 20px;
+        /* Adjust the cell height */
+        border: 1px solid #41FF00;
+        /* Add borders to cells */
+    }
+
+    .alive {
+        background-color: #41FF00;
+        /* Set the background color of alive cells */
+    }
+
+    .dead {
+        background-color: black;
+        /* Set the background color of dead cells */
+    }
+
+
     .console {
         padding: 12px 20px;
         font-family: 'Courier New', Courier, monospace;
@@ -31,13 +67,14 @@
         width: 500px;
         background-color: black;
     }
-    
+
     section {
         border: 1px green solid;
         padding: 7px;
     }
+
     /* Education */
-    
+
     .education-part {
         width: 200px;
         border: #41FF00 dashed 1px;
@@ -47,90 +84,93 @@
         padding: 5px;
         margin-bottom: 50px;
     }
-    
+
     .education-part h3 {
         border-bottom: #41FF00 dashed 1px;
         margin-bottom: 5px;
     }
+
     /* About */
-    
+
     #about-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
     }
-    
+
     #about-text {
         width: 500px;
         margin-top: 10px;
     }
+
     /* skills */
-    
+
     #skillgrid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         row-gap: 10px;
     }
-    
+
     @media (max-width:1000px) {
         body {
             width: 100%;
         }
+
         #skillgrid {
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         }
     }
-    
+
     .skillelement {
         border: #41FF00 dashed 1px;
         padding: 10px;
         width: 150px;
     }
-    
+
     .skillelement h4 {
         padding-bottom: 10px;
     }
-    
+
     .skillelement p {
         margin-top: 10px;
         text-align: left;
     }
-    
+
     #image {
         font-size: xx-small;
         text-align: left;
     }
-    
+
     .part {
         padding: 7px;
         text-align: center;
         display: none;
         height: 600px;
     }
-    
+
     h2 {
         margin-bottom: 20px;
     }
-    
+
     .current {
         display: block;
     }
-    
+
     aside {
         border: 1px green solid;
     }
-    
+
     ul {
         list-style: none;
     }
-    
+
     li {
         padding: 7px;
     }
-    
+
     .hidden-tab {
         display: none;
     }
-    
+
     li:hover {
         border: #41FF00 dashed 1px;
     }
@@ -149,24 +189,29 @@
         background-color: #41FF00;
         color: #000000;
     }
-    
+
     @media only screen and (max-width:600px) {
         body {
             width: 100%;
         }
+
         .console {
             width: 200px;
         }
+
         .image {
             display: none;
             background-color: #41FF00;
         }
+
         #image p {
             display: none;
         }
+
         #about-text {
             width: 300px;
         }
+
         li:hover {
             background-color: #000000;
             border: #41FF00 1px dashed;

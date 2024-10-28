@@ -18,14 +18,14 @@ var current = document.getElementsByClassName("current");
 const searchBar = document.getElementsByClassName("console");
 
 var results = [
-    ["> education", 1],
-    ["> experience", 2],
-    ["> skills", 3],
-    ["> hobbies", 4],
-    ["> about", 5],
-    ["> contact", 6],
-    ["> projects", 7],
-    ["> jupiter", 8],
+    ["education", 1],
+    ["experience", 2],
+    ["skills", 3],
+    ["hobbies", 4],
+    ["about", 5],
+    ["contact", 6],
+    ["projects", 7],
+    ["jupiter", 8],
 ];
 
 var shownTabs = [1, 2, 3, 4];
@@ -36,42 +36,42 @@ function show(part) {
         case 1:
             current[0].classList.remove('current');
             Education.classList.add('current');
-            searchBar[0].value = "> education";
+            searchBar[0].value = "education";
             break;
         case 2:
             current[0].classList.remove('current');
             Experience.classList.add('current');
-            searchBar[0].value = "> experience";
+            searchBar[0].value = "experience";
             break;
         case 3:
             current[0].classList.remove('current');
             Skills.classList.add('current');
-            searchBar[0].value = "> skills";
+            searchBar[0].value = "skills";
             break;
         case 4:
             current[0].classList.remove('current');
             Hobbies.classList.add('current');
-            searchBar[0].value = "> hobbies";
+            searchBar[0].value = "hobbies";
             break;
         case 5:
             current[0].classList.remove('current');
             About.classList.add('current');
-            searchBar[0].value = "> about";
+            searchBar[0].value = "about";
             break;
         case 6:
             current[0].classList.remove('current');
             Contact.classList.add('current');
-            searchBar[0].value = "> contact";
+            searchBar[0].value = "contact";
             break;
         case 7:
             current[0].classList.remove('current');
             Projects.classList.add('current');
-            searchBar[0].value = "> projects";
+            searchBar[0].value = "projects";
             break;
         case 8:
             current[0].classList.remove('current');
             Jupiter.classList.add('current');
-            searchBar[0].value = "> jupiter";
+            searchBar[0].value = "jupiter";
             break;
 
         default:
@@ -127,6 +127,100 @@ function UnlockAll(params) {
 }
 
 
+// Set up the grid
+const numRows = 5; // Number of rows in the grid
+const numCols = 5; // Number of columns in the grid
+let grid = createEmptyGrid(); // Create an empty grid
 
+// Function to create an empty grid
+function createEmptyGrid() {
+  const emptyGrid = new Array(numRows);
+  for (let i = 0; i < numRows; i++) {
+    emptyGrid[i] = new Array(numCols).fill(0);
+  }
+  return emptyGrid;
+}
 
-//Blank
+// Function to initialize the grid with random alive cells
+function initializeGrid() {
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      grid[i][j] = Math.floor(Math.random() * 2); // Randomly set cell state to 0 or 1
+    }
+  }
+}
+
+// Function to display the grid
+function displayGrid() {
+  const gridContainer = document.getElementById('grid-container');
+  gridContainer.innerHTML = ''; // Clear previous grid
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      const cell = document.createElement('div');
+      cell.className = grid[i][j] ? 'alive' : 'dead'; // Set cell class based on state
+      gridContainer.appendChild(cell);
+    }
+  }
+}
+
+// Function to update the grid based on the rules of the Game of Life
+function updateGrid() {
+  const newGrid = createEmptyGrid();
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      const neighbors = countAliveNeighbors(i, j);
+      if (grid[i][j] === 1) {
+        // Cell is alive
+        if (neighbors < 2 || neighbors > 3) {
+          // Any live cell with fewer than two or more than three live neighbors dies
+          newGrid[i][j] = 0;
+        } else {
+          // Any live cell with two or three live neighbors survives
+          newGrid[i][j] = 1;
+        }
+      } else {
+        // Cell is dead
+        if (neighbors === 3) {
+          // Any dead cell with exactly three live neighbors becomes alive
+          newGrid[i][j] = 1;
+        }
+      }
+    }
+  }
+
+  grid = newGrid; // Update the grid
+}
+
+// Function to count the number of alive neighbors of a cell
+function countAliveNeighbors(row, col) {
+  let count = 0;
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if (i === 0 && j === 0) continue; // Exclude the current cell
+
+      const neighborRow = (row + i + numRows) % numRows; // Handle edge wrapping
+      const neighborCol = (col + j + numCols) % numCols; // Handle edge wrapping
+
+      count += grid[neighborRow][neighborCol];
+    }
+  }
+  return count;
+}
+
+// Function to start the game
+function startGame() {
+    initializeGrid(); // Initialize the grid with random alive cells
+    displayGrid(); // Display the initial grid
+  
+    // Start the game loop
+    setInterval(() => {
+      updateGrid(); // Update the grid based on the rules of the Game of Life
+      displayGrid(); // Display the updated grid
+    }, 200); // Adjust the interval (in milliseconds) to control the speed of the game
+  }
+  
+  // Call the startGame function to start the game
+  startGame();
+  
