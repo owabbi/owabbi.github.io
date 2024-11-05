@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Island with Half Sand-Half Grass Tiles</title>
+</head>
+
+<body>
+    <canvas id="islandCanvas" width="400" height="400"></canvas>
+    <br>
+    <button id="stepButton">Next Step</button>
+    <button id="skipAllButton">Skip All</button>
+    <button id="toggleGridButton">Toggle Grid</button>
+
+    <script>
+
+        let showGrid = false;
+        // Define tiles and constraints
+        const tiles = {
+            water: { color: "#00aaff", neighbors: ["water", "sand"] },
+            sand: { color: "#ffe680", neighbors: ["sand", "water", "grass"] },
+            grass: { color: "#66ff66", neighbors: ["grass", "sand", "trees", "rocks"] },
+            trees: { color: "#006600", neighbors: ["trees", "grass", "rocks"] },
+            rocks: { color: "#808080", neighbors: ["water", "sand", "grass", "trees", "rocks"] } // Rocks can be next to anything
+        };
+
+        // Grid settings
+        const gridSize = 20; // 20x20 grid
+        const tileSize = 20; // 20 pixels per tile
+        const grid = Array.from({ length: gridSize }, () =>
+            Array.from({ length: gridSize }, () => ({ collapsed: false, options: Object.keys(tiles) }))
+        );
+
+        const canvas = document.getElementById("islandCanvas");
+        const ctx = canvas.getContext("2d");
+        let collapseQueue = [];  // Queue to store cells to collapse
+        let autoCollapse = false; // Flag for "Skip All" mode
+
+        // Initialize the grid with preset water borders and allow adjacent cells to be water or sand
+        function initializeBorders() {
+            for (let x = 0; x < gridSize; x++) {
+                grid[0][x] = { collapsed: true, options: ["water"] };            // Top row
+                grid[gridSize - 1][x] = { collapsed: true, options: ["water"] }; // Bottom row
+                grid[x][0] = { collapsed: true, options: ["water"] };            // Left column
+                grid[x][gridSize - 1] = { collapsed: true, options: ["water"] }; // Right column
+            }
+
+            // Set adjacent cells to allow either water or sand
+            for (let x = 1; x < gridSize - 1; x++) {
+                grid[1][x].options = ["water", "sand"];             // Second row
+                grid[gridSize - 2][x].options = ["water", "sand"];  // Second-last row
+                grid[x][1].options = ["water", "sand"];             // Second column
+                grid[x][gridSize - 2].options = ["water", "sand"];  // Second-last column
+            }
+
+            // Seed the center with grass or trees for island formation
+            const centerX = Math.floor(gridSize / 2);
+            const centerY = Math.floor(gridSize / 2);
+            const seedRadius = 3;
+
+            for (let dy = -seedRadius; dy <= seedRadius; dy++) {
+                for (let dx = -seedRadius; dx <= seedRadius; dx++) {
+                    const x = centerX + dx;
+                    const y = centerY + dy;
+                    if (x > 1 && x < gridSize - 2 && y > 1 && y < gridSize - 2) {
+                        grid[y][x].options = ["grass", "trees"];
+                    }
+                }
+            }
+        }
+
+        // Collapse a cell to a specific tile
+        function collapseCell(cell) {
+            if (cell.options.length === 0) {
+                console.warn("No options available for cell. Defaulting to 'rocks'.");
+                cell.options = ["rocks"]; // Default to "rocks" if no other options are available
+            }
+            const choice = cell.options[Math.floor(Math.random() * cell.options.length)];
+            cell.collapsed = true;
+            cell.options = [choice];
+            return choice;
+        }
+
+        // Propagate constraints to neighboring cells
+        function propagate(x, y) {
+            const cell = grid[y][x];
+            if (!cell.collapsed) return;
+
+            const tile = cell.options[0];
+            const neighbors = [
+                [x - 1, y], [x + 1, y], // left, right
+                [x, y - 1], [x, y + 1]  // top, bottom
+            ];
+
+            neighbors.forEach(([nx, ny]) => {
+                if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+                    const neighbor = grid[ny][nx];
+                    if (!neighbor.collapsed && tiles[tile]) {  // Check if tile exists in tiles object
+                        neighbor.options = neighbor.options.filter(opt => tiles[tile].neighbors.includes(opt));
+                        if (neighbor.options.length === 1) {
+                            collapseQueue.push([nx, ny]);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Collapse the entire grid in one go
+        async function completeCollapse() {
+            autoCollapse = true;
+            while (grid.some(row => row.some(cell => !cell.collapsed))) {
+                await waveFunctionCollapseStep();
+            }
+            autoCollapse = false;
+
+            addHalfTiles();
+        }
+
+        // Step-by-step collapse function
+        async function waveFunctionCollapseStep() {
+            if (!grid.some(row => row.some(cell => !cell.collapsed))) return;
+
+            if (collapseQueue.length === 0) {
+                let minOptions = Infinity;
+                let minPos = null;
+
+                grid.forEach((row, y) => {
+                    row.forEach((cell, x) => {
+                        if (!cell.collapsed && cell.options.length < minOptions) {
+                            minOptions = cell.options.length;
+                            minPos = [x, y];
+                        }
+                    });
+                });
+
+                if (minPos) collapseQueue.push(minPos);
+            }
+
+            if (collapseQueue.length > 0) {
+                const [x, y] = collapseQueue.shift();
+                collapseCell(grid[y][x]);
+                propagate(x, y);
+                renderGrid();
+            }
+        }
+
+        // Render the entire grid
+        function renderGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    const cell = grid[y][x];
+                    if (cell.collapsed) {
+                        drawTile(x, y, cell.options[0]);
+                    }
+                    if (showGrid) {
+                        ctx.strokeStyle = "black";
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize); // Draw border
+                    }
+
+                }
+            }
+        }
+
+        // Draw a single tile based on its type
+        function drawTile(x, y, tileType) {
+            if (tiles[tileType]) {  // Check if tileType exists in tiles object
+                ctx.fillStyle = tiles[tileType].color;
+                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            }
+        }
+
+        // Post-process to add half sand-half grass tiles
+        function addHalfTiles() {
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    const cell = grid[y][x];
+                    const neighborTypes = getNeighborTypes(x, y);
+                    if (Object.keys(neighborTypes).length == 4 && (neighborTypes["top"] != neighborTypes["bottom"] && neighborTypes["right"] != neighborTypes["left"])){
+                        drawHalfTile(x, y, neighborTypes, cell.options[0]);
+                    }
+                }
+            }
+        }
+
+        function getNeighborTypes(x, y) {
+            const neighbors = [
+                { dx: -1, dy: 0, direction: "left" },
+                { dx: 1, dy: 0, direction: "right" },
+                { dx: 0, dy: -1, direction: "top" },
+                { dx: 0, dy: 1, direction: "bottom" }
+            ];
+
+            const neighborTypes = {};  // Store types by direction
+
+            for (const { dx, dy, direction } of neighbors) {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+                    const neighbor = grid[ny][nx];
+                    if (neighbor.collapsed) {
+                        neighborTypes[direction] = neighbor.options[0];  // Store neighbor type by direction
+                    }
+                }
+            }
+
+            return neighborTypes;
+        }
+
+
+        // Draw a half sand-half grass tile based on the direction
+        function drawHalfTile(x, y, neighborTypes, baseColor) {
+            console.log(x, y, neighborTypes);
+            const waterColor = tiles["water"].color;
+            const sandColor = tiles["sand"].color;
+            const grassColor = tiles["grass"].color;
+            const treeColor = tiles["trees"].color;
+
+            if( neighborTypes["top"] == neighborTypes["left"]) {
+                console.log(tiles[neighborTypes["top"]].color);
+                ctx.fillStyle = tiles[neighborTypes["top"]].color;
+                ctx.fillRect(x * tileSize, y * tileSize, tileSize /2, tileSize);
+                ctx.fillStyle = tiles[baseColor].color;
+                console.log(tiles[baseColor].color);
+                ctx.fillRect(x * tileSize + tileSize / 2, y * tileSize, tileSize / 2, tileSize);
+            }
+            // if (direction === "left") {
+            //     ctx.fillStyle = grassColor;
+            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize / 2, tileSize);
+            //     ctx.fillStyle = sandColor;
+            //     ctx.fillRect(x * tileSize + tileSize / 2, y * tileSize, tileSize / 2, tileSize);
+            // } else if (direction === "right") {
+            //     ctx.fillStyle = sandColor;
+            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize / 2, tileSize);
+            //     ctx.fillStyle = grassColor;
+            //     ctx.fillRect(x * tileSize + tileSize / 2, y * tileSize, tileSize / 2, tileSize);
+            // } else if (direction === "top") {
+            //     ctx.fillStyle = grassColor;
+            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize / 2);
+            //     ctx.fillStyle = sandColor;
+            //     ctx.fillRect(x * tileSize, y * tileSize + tileSize / 2, tileSize, tileSize / 2);
+            // } else if (direction === "bottom") {
+            //     ctx.fillStyle = sandColor;
+            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize / 2);
+            //     ctx.fillStyle = grassColor;
+            //     ctx.fillRect(x * tileSize, y * tileSize + tileSize / 2, tileSize, tileSize / 2);
+            // }
+
+            if (showGrid) {
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            }
+        }
+
+        // Utility function to add a delay
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Initial render and setup
+        function initializeCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            initializeBorders();
+            renderGrid();
+        }
+
+        // Button handler to proceed to the next step
+        document.getElementById("stepButton").addEventListener("click", waveFunctionCollapseStep);
+
+        // Button handler to "Skip All" and complete collapse in one go
+        document.getElementById("skipAllButton").addEventListener("click", completeCollapse);
+
+        document.getElementById("toggleGridButton").addEventListener("click", () => {
+            showGrid = !showGrid;
+            renderGrid(); // Re-render to apply grid change
+        });
+
+        // Start the island generation with an initial setup
+        initializeCanvas();
+    </script>
+</body>
+
+</html>
