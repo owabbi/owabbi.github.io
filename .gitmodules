@@ -1,9 +1,0 @@
-[submodule "jupiter"]
-	path = jupiter
-	url = https://github.com/owabbi/Jupiter2029.git
-[submodule "projects/jupiter"]
-	path = projects/jupiter
-	url = https://github.com/owabbi/Jupiter2029.git
-[submodule "projects/treeflow"]
-	path = projects/treeflow
-	url = https://github.com/owabbi/TreeFlowJS.git
