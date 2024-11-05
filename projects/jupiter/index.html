@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Physicscd Tests</title>
+    <link rel="stylesheet" href="src/css/style.css">
+</head>
+
+<body>
+
+    <canvas id="canvas" width="1000" height="500" style="border:1px solid #000000;">
+        Your browser does not support the HTML canvas tag.
+    </canvas>
+    <p id="coords">Not selected yet</p>
+    <p id="number">No circles yet</p>
+
+    <button id="startBtn">Start</button>
+    <button id="stopBtn">Stop</button>
+    <script src="src/js/script.js" type="module" ></script>
+
+    <label for="GumBall">Switch to GravityBall</label>
+    <input type="checkbox" id="GumBall">
+    <div id="showArrow">
+        <label for="Grid">Grid</label>
+        <input type="checkbox" id="Grid">
+    </div>
+
+    <div id="addGumBalls">
+        <label for="AddGumBallNbr">Add GravityBall</label>
+        <input type="number" id="AddGumBallNbr" min="0" max="100">
+        <button id="AddGumBallBtn" >Generate</button>
+    </div>
+    <div id="drawLine">
+        <label for="DrawLine">Draw Line</label>
+        <input type="checkbox" id="DrawLine">
+    </div>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>FlowChart</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+</head>
+
+<body onload="Start()">
+    <canvas id="canvas" width="600" height="800" style="border: 1px solid #000000;">
+        Your browser does not support the HTML canvas.
+    </canvas>
+    <div class="interface">
+        <button onclick="EnableAddCircle()" id="addCircle">Add Circle</button>
+        <button onclick="DisableAddCircle()" id="stopAddCircle">Stop Adding Circle</button><br><br>
+        <button onclick="MoveCircle()">Move Circle</button>
+        <button onclick="StopMoveCircle()">Stop Moving Circle</button>
+        <br/> <button onclick="MoveBreakpoint()">Move Breakpoint</button>
+        <button onclick="StopMoveBreakpoint()">Stop MoveBreakpoint</button>
+        <button onclick="EnableDrawSegment()" id="addSegment">Draw Segment</button>
+        <button onclick="DisableDrawSegment()" id="stopAddSegment">Stop Draw Segment</button><br>
+        <button onclick="ShowBreakpoints()">Show Breakpoints</button>
+        <button onclick="HideBreakpoints()">Hide Breakpoints</button><br>
+        <button onclick="SaveFile()">Save</button>
+        <input type="file" id="loadFile">
+    </div>
+
+    <br>
+
+    <div id="FlowList">
+        <div class="FlowElement" id="Element1" onclick="SwitchFlow(0)">
+            <p id="NameElement1">Default</p>
+            <div class="FlowIcon">
+                <div class="Cercle" id="IconElement1"></div>
+            </div>
+            <button onclick="EditFlow(1)">Edit</button>
+        </div>
+        <div class="FlowElement" id="Element2" onclick="SwitchFlow(1)">
+            <p id="NameElement2">Default</p>
+            <div class="FlowIcon">
+                <div class="Cercle" id="IconElement2"></div>
+            </div>
+            <button onclick="EditFlow(2)">Edit</button>
+            <button onclick="DeleteFlow(2)">Delete</button>
+        </div>
+        <div class="FlowElement" id="Element3" onclick="SwitchFlow(2)">
+            <p id="NameElement3">Default</p>
+            <div class="FlowIcon">
+                <div class="Cercle" id="IconElement3"></div>
+            </div>
+            <button onclick="EditFlow(3)">Edit</button>
+            <button onclick="DeleteFlow(3)">Delete</button>
+        </div>
+        <div class="FlowElement" id="Element4" onclick="SwitchFlow(3)">
+            <p id="NameElement4">Default</p>
+            <div class="FlowIcon">
+                <div class="Cercle" id="IconElement4"></div>
+            </div>
+            <button onclick="EditFlow(4)">Edit</button>
+            <button onclick="DeleteFlow(4)">Delete</button>
+        </div>
+        <div class="FlowElement" id="Element5" onclick="SwitchFlow(4)">
+            <p id="NameElement5">Default</p>
+            <div class="FlowIcon">
+                <div class="Cercle" id="IconElement5"></div>
+            </div>
+            <button onclick="EditFlow(5)">Edit</button>
+            <button onclick="DeleteFlow(5)">Delete</button>
+        </div>
+
+
+        <div class="FlowElement" id="ElementAdd">
+            <span class="addFlow" onclick="OpenFlowModal()">&oplus;</span>
+        </div>
+    </div>
+    <div id="FlowModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="CloseFlowModal()">&times;</span>
+            <label for="FlowName">Flow Name : </label>
+            <input type="text" id="FlowName" value="Flow">
+            <br><br>
+            <div class="color">
+                <label for="RedColor">R :</label>
+                <input type="number" id="RedColor" min="0" max="255" value="0">
+                <label for="GreenColor">G :</label>
+                <input type="number" id="GreenColor" min="0" max="255" value="0">
+                <label for="BlueColor">B :</label>
+                <input type="number" id="BlueColor" min="0" max="255" value="0">
+                <button id="ChangeColorButton" onclick="AddFlow()">Add Flow</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
