@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Island with Half Sand-Half Grass Tiles</title>
+    <title>wfc</title>
 </head>
 
 <body>
@@ -15,7 +15,7 @@
     <button id="toggleGridButton">Toggle Grid</button>
 
     <script>
-        console.log("test test test");
+        console.log("test test test A");
 
         let showGrid = false;
         // Define tiles and constraints
@@ -285,16 +285,13 @@
 
         function sendHeight() {
             const height = document.documentElement.scrollHeight;
-            window.parent.postMessage({ iframeId: 'iframe' + document.title, height }, '*');
+            window.parent.postMessage({ iframeId: 'iframewfc', height , truc: 'truc'}, '*');
         }
 
         // Send the height on load and when the window resizes
         window.onload = sendHeight;
         window.onresize = sendHeight;
-
-        // Optional: Zoom out content by 90%
-        document.body.style.transform = 'scale(0.9)';
-        document.body.style.transformOrigin = '0 0';
+        console.log("truc truc truc");
     </script>
 </body>
 
