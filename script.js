@@ -13,6 +13,8 @@ var WFC = document.getElementById("wfc");
 var tabAbout = document.getElementById("tab-about");
 var tabContact = document.getElementById("tab-contact");
 var tabJupiter = document.getElementById("tab-jupiter");
+var tabTreeFlow = document.getElementById("tab-treeflow");
+var tabWFC = document.getElementById("tab-wfc");
 
 const allDivs = document.getElementsByClassName("part");
 var current = document.getElementsByClassName("current");
@@ -126,10 +128,10 @@ function activateTab(tabID) {
       tabJupiter.classList.remove('hidden-tab');
       break;
     case 9:
-      tabJupiter.classList.remove('hidden-tab');
+      tabTreeFlow.classList.remove('hidden-tab');
       break;
     case 10:
-      tabJupiter.classList.remove('hidden-tab');
+      tabWFC.classList.remove('hidden-tab');
       break;
 
     default:
@@ -161,7 +163,7 @@ function activate() {
 
 function UnlockAll(params) {
   console.log("Unlock all");
-  for (let index = 0; index < 9; index++) {
+  for (let index = 0; index < 11; index++) {
     activateTab(index);
   }
 }

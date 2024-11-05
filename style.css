@@ -190,6 +190,24 @@
         color: #000000;
     }
 
+    /* Iframe */
+
+    .iframe-container {
+        padding: 20px;
+        background-color: #f4f4f4;
+        /* Optional: background color for visual separation */
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        border-radius: 8px;
+    }
+
+    iframe {
+        width: 100%;
+        height: 500px;
+        border: none;
+        display: block;
+    }
+
     @media only screen and (max-width:600px) {
         body {
             width: 100%;
