@@ -234,7 +234,23 @@ function updateGrid() {
     }
   }
 
+  
+
   grid = newGrid; // Update the grid
+  if (isGridEmpty()){
+    initializeGrid();
+  }
+}
+
+function isGridEmpty() {
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      if (grid[i][j] === 1) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 // Function to count the number of alive neighbors of a cell
