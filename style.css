@@ -144,7 +144,7 @@
         padding: 7px;
         text-align: center;
         display: none;
-        height: 600px;
+        height: auto;
     }
 
     h2 {
@@ -192,9 +192,15 @@
 
     /* Iframe */
 
+    .parent-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .iframe-container {
         padding: 20px;
-        background-color: #f4f4f4;
+        background-color: #494949;
         /* Optional: background color for visual separation */
         border: 1px solid #ddd;
         box-sizing: border-box;
@@ -203,7 +209,6 @@
 
     iframe {
         width: 100%;
-        height: 500px;
         border: none;
         display: block;
     }

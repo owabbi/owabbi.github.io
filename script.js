@@ -9,6 +9,8 @@ var Jupiter = document.getElementById("jupiter");
 var TreeFlow = document.getElementById("treeflow");
 var WFC = document.getElementById("wfc");
 
+let aside = document.getElementById("lowermenu");
+
 
 var tabAbout = document.getElementById("tab-about");
 var tabContact = document.getElementById("tab-contact");
@@ -30,32 +32,32 @@ var results = [
   ["contact", 6],
   ["projects", 7],
   ["jupiter", 8],
-  ["treeflow", 9],
   ["wfc", 10],
 ];
 
 var shownTabs = [1, 2, 3, 4];
 
 function showProject() {
-  console.log("called");
   const projectNames = ["jupiter", "treeflow", "wfc"];
   projectNames.forEach(projectName => {
     let projectDiv = document.getElementById(projectName);
     let iframe = document.getElementById(`iframe${projectName}`);
-    console.log(projectDiv.classList);
-    console.log(iframe);
-
     if (projectDiv.classList.contains('current')) {
-      console.log("in if");
-      iframe.src = `https://owabbi.github.io/projects/${projectName.toLowerCase()}/index.html`;
+      iframe.src = `projects/${projectName.toLowerCase()}/index.html?v=${Date.now()}`;
     } else {
       iframe.src = "";
     }
   });
 }
 
+function adjustAsideMargin() {
+  if (aside) {
+    aside.style.marginTop = "0px";
+  }
+}
 
 function show(part) {
+  adjustAsideMargin();
   switch (part) {
     case 1:
       current[0].classList.remove('current');
@@ -97,11 +99,11 @@ function show(part) {
       Jupiter.classList.add('current');
       searchBar[0].value = "jupiter";
       break;
-    case 9:
-      current[0].classList.remove('current');
-      TreeFlow.classList.add('current');
-      searchBar[0].value = "treeflow";
-      break;
+    // case 9:
+    //   current[0].classList.remove('current');
+    //   TreeFlow.classList.add('current');
+    //   searchBar[0].value = "treeflow";
+    //   break;
     case 10:
       current[0].classList.remove('current');
       WFC.classList.add('current');
@@ -127,9 +129,9 @@ function activateTab(tabID) {
     case 8:
       tabJupiter.classList.remove('hidden-tab');
       break;
-    case 9:
-      tabTreeFlow.classList.remove('hidden-tab');
-      break;
+    // case 9:
+    //   tabTreeFlow.classList.remove('hidden-tab');
+    //   break;
     case 10:
       tabWFC.classList.remove('hidden-tab');
       break;
@@ -266,3 +268,16 @@ function startGame() {
 // Call the startGame function to start the game
 startGame();
 
+window.addEventListener('message', event => {
+  if (event.origin !== 'http://owabbi.github.io') return;
+
+  const { iframeId, height, width } = event.data;
+  const iframe = document.getElementById(iframeId);
+
+  if (iframe) {
+    const iframeContainer = iframe.parentElement;
+    iframe.style.height = height + 'px';
+    // aside.style.marginTop = (height - 480) + 'px';
+    iframeContainer.style.width = (width + 60) + 'px';
+  }
+});

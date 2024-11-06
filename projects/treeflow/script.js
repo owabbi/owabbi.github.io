@@ -647,3 +647,12 @@ function ShowBreakpoints(params) {
 function HideBreakpoints(params) {
     ShowBreakPointsFlag = false;
 }
+
+function sendHeight() {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ iframeId: 'iframetreeflow', height, width: 600 }, '*');
+}
+
+// Send the height on load and when the window resizes
+window.onload = sendHeight;
+// window.onresize = sendHeight;

@@ -6,21 +6,28 @@
 
 body{
     position: absolute;
-text-align: center;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* p {
     text-align: center;
 } */
 
-canvas {
-    margin-left: 50%;
-}
-
-#startBtn {
+#stopBtn {
     display: none;
 }
 
+canvas {
+    display: block;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+}
 
 /* canvas {
     background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);

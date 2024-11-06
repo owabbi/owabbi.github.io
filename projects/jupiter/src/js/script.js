@@ -41,7 +41,7 @@ function getMousePosition(event) {
     var x = event.clientX;
     var y = event.clientY;
     var trueX = x - 500;
-return [trueX, y];
+return [x, y];
 }
 
 var Area = {
@@ -62,14 +62,14 @@ var Area = {
 function StartGravity() {
     console.log("Start Gravity");
     startBtn.style.display = "none";
-    stopBtn.style.display = "block";
+    stopBtn.style.display = "inline-block";
     Area.start();
 }
 
 function StopGravity() {
     console.log("Stop Gravity");
     stopBtn.style.display = "none";
-    startBtn.style.display = "block";
+    startBtn.style.display = "inline-block";
     Area.stop();
 }
 
@@ -252,3 +252,12 @@ function AddGumBalls() {
 function milliSecondsAdder() {
     milliSeconds++;
 }
+
+function sendHeight() {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ iframeId: 'iframejupiter', height, width: 1000 }, '*');
+}
+
+// Send the height on load and when the window resizes
+window.onload = sendHeight;
+// window.onresize = sendHeight;

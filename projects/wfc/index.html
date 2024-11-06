@@ -13,6 +13,7 @@
     <button id="stepButton">Next Step</button>
     <button id="skipAllButton">Skip All</button>
     <button id="toggleGridButton">Toggle Grid</button>
+    <button id="recreateMapButton">Recreate Map</button>
 
     <script>
         console.log("test test test A");
@@ -180,7 +181,7 @@
                 for (let x = 0; x < gridSize; x++) {
                     const cell = grid[y][x];
                     const neighborTypes = getNeighborTypes(x, y);
-                    if (Object.keys(neighborTypes).length == 4 && (neighborTypes["top"] != neighborTypes["bottom"] && neighborTypes["right"] != neighborTypes["left"])) {
+                    if (Object.keys(neighborTypes).length == 4 && (neighborTypes["top"] != neighborTypes["bottom"] || neighborTypes["right"] != neighborTypes["left"])) {
                         drawHalfTile(x, y, neighborTypes, cell.options[0]);
                     }
                 }
@@ -214,41 +215,35 @@
 
         // Draw a half sand-half grass tile based on the direction
         function drawHalfTile(x, y, neighborTypes, baseColor) {
-            console.log(x, y, neighborTypes);
+
+            if (baseColor === "trees")  return;
             const waterColor = tiles["water"].color;
             const sandColor = tiles["sand"].color;
             const grassColor = tiles["grass"].color;
             const treeColor = tiles["trees"].color;
+            const rocksColor = tiles["rocks"].color;
 
-            if (neighborTypes["top"] == neighborTypes["left"]) {
-                console.log(tiles[neighborTypes["top"]].color);
-                ctx.fillStyle = tiles[neighborTypes["top"]].color;
-                ctx.fillRect(x * tileSize, y * tileSize, tileSize / 2, tileSize);
-                ctx.fillStyle = tiles[baseColor].color;
-                console.log(tiles[baseColor].color);
-                ctx.fillRect(x * tileSize + tileSize / 2, y * tileSize, tileSize / 2, tileSize);
+            if (neighborTypes["top"] != neighborTypes["bottom"]) {
+                if (neighborTypes["top"] == baseColor) {
+                    ctx.fillStyle = tiles[neighborTypes["bottom"]].color;
+                    ctx.fillRect(x * tileSize, y * tileSize + tileSize / 2, tileSize, tileSize / 2);
+                }
+                if (neighborTypes["bottom"] == baseColor) {
+                    ctx.fillStyle = tiles[neighborTypes["top"]].color;
+                    ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize / 2);
+                }
             }
-            // if (direction === "left") {
-            //     ctx.fillStyle = grassColor;
-            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize / 2, tileSize);
-            //     ctx.fillStyle = sandColor;
-            //     ctx.fillRect(x * tileSize + tileSize / 2, y * tileSize, tileSize / 2, tileSize);
-            // } else if (direction === "right") {
-            //     ctx.fillStyle = sandColor;
-            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize / 2, tileSize);
-            //     ctx.fillStyle = grassColor;
-            //     ctx.fillRect(x * tileSize + tileSize / 2, y * tileSize, tileSize / 2, tileSize);
-            // } else if (direction === "top") {
-            //     ctx.fillStyle = grassColor;
-            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize / 2);
-            //     ctx.fillStyle = sandColor;
-            //     ctx.fillRect(x * tileSize, y * tileSize + tileSize / 2, tileSize, tileSize / 2);
-            // } else if (direction === "bottom") {
-            //     ctx.fillStyle = sandColor;
-            //     ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize / 2);
-            //     ctx.fillStyle = grassColor;
-            //     ctx.fillRect(x * tileSize, y * tileSize + tileSize / 2, tileSize, tileSize / 2);
-            // }
+
+            if (neighborTypes["left"] != neighborTypes["right"]) {
+                if (neighborTypes["right"] == baseColor) {
+                    ctx.fillStyle = tiles[neighborTypes["left"]].color;
+                    ctx.fillRect(x * tileSize, y * tileSize, tileSize / 2, tileSize);
+                }
+                if (neighborTypes["left"] == baseColor) {
+                    ctx.fillStyle = tiles[neighborTypes["right"]].color;
+                    ctx.fillRect(x * tileSize + tileSize / 2, y * tileSize, tileSize / 2, tileSize);
+                }
+            }
 
             if (showGrid) {
                 ctx.strokeStyle = "black";
@@ -280,18 +275,35 @@
             renderGrid(); // Re-render to apply grid change
         });
 
+        document.getElementById("recreateMapButton").addEventListener("click", () => {
+            resetGrid();
+            completeCollapse(); // Regenerate the map
+            renderGrid(); // Display the new map
+        });
+
+        function resetGrid() {
+            // Clear the grid by resetting each cell's state
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    grid[y][x] = { collapsed: false, options: Object.keys(tiles) };
+                }
+            }
+
+            // Reapply initial setup (e.g., borders and seeded center)
+            initializeBorders();
+        }
+
         // Start the island generation with an initial setup
         initializeCanvas();
 
         function sendHeight() {
-            const height = document.documentElement.scrollHeight;
-            window.parent.postMessage({ iframeId: 'iframewfc', height , truc: 'truc'}, '*');
+            const height = document.documentElement.scrollHeight - 200;
+            window.parent.postMessage({ iframeId: 'iframewfc', height, width: 400 }, '*');
         }
 
         // Send the height on load and when the window resizes
         window.onload = sendHeight;
-        window.onresize = sendHeight;
-        console.log("truc truc truc");
+        // window.onresize = sendHeight;
     </script>
 </body>
 
