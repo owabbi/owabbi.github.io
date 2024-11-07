@@ -1,9 +1,7 @@
-console.log("test test test A");
-
 let showGrid = false;
 // Define tiles and constraints
 const tiles = {
-    water: { colors: ["#00aaff", "#0099dd"], neighbors: ["water", "sand", "rocks"] },
+    water: { colors: ["#00aaff", "#99ccff"], neighbors: ["water", "sand", "rocks"] },
     sand: { color: "#ffe680", neighbors: ["sand", "water", "grass"] },
     grass: { color: "#66ff66", neighbors: ["grass", "sand", "trees", "rocks"] },
     trees: { color: "#006600", neighbors: ["trees", "grass", "rocks"] },
@@ -38,9 +36,6 @@ function applyPreferences() {
 
     const treeDensitySlider = document.getElementById("treeDensitySlider");
     const treeDensity = parseInt(treeDensitySlider.value, 10) / 100; // Convert to decimal
-
-    const potatoFactorSlider = document.getElementById("potatoFactorSlider");
-    const potatoFactor = parseInt(potatoFactorSlider.value, 10) / 100; // Convert to decimal
 
     if (isNaN(islandSize)) {
         console.error("Invalid islandSize from slider. Using default of 3.");
@@ -112,6 +107,23 @@ function smoothMap() {
         }
     }
     grid = newGrid; // Update grid with smoothed version
+}
+
+function updateTreeDensity(densityValue) {
+    // Example logic to place trees based on the new density value
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const cell = grid[y][x];
+            if (cell.options.includes("grass") && Math.random() * 100 < densityValue) {
+                cell.options = ["trees"]; // Set cell as tree if within density range
+            } else if (cell.options.includes("trees") && Math.random() * 100 >= densityValue) {
+                cell.options = ["grass"]; // Convert tree to grass if above density range
+            }
+        }
+    }
+
+    // Render the updated grid
+    renderGrid();
 }
 
 
@@ -209,7 +221,8 @@ function initializeMap() {
     applyPreferences();           // Step 3: Apply border and center constraints
     // smoothMap();
     startCollapse();
-    // startAnimation();
+    initializeWaves();
+    startWaveAnimation();
 }
 
 // Trigger map recreation with a button click
@@ -262,51 +275,88 @@ document.getElementById("recreateMapButton").addEventListener("click", initializ
 
 
 // Render the entire grid
-function renderGrid(showOptionCount = false) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
+function renderGrid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
 
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
             const cell = grid[y][x];
+            const tileType = cell.options[0];
 
-            // Draw the final tile color if collapsed
-            if (cell.collapsed) {
-                const tileType = cell.options[0]; // Collapsed type
-                let isWave = tileType === "water" && activeWaves[y].includes(x);
-                if (tileType === "water") {
-                    isWave = activeWaves[y].includes(x);
-                    // Choose color based on whether the cell is the wave cell
-                    ctx.fillStyle = cell.isWave ? tiles.water.colors[1] : tiles.water.colors[0];
-                } else {
-                    // Use the static color for non-water tiles
-                    ctx.fillStyle = tiles[tileType].color;
-                }
-                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            // Check if this cell is currently a wave based on activeWaves
+            let isWave = tileType === "water" && Array.isArray(activeWaves[y]) && activeWaves[y].includes(x);
+
+            // Choose color based on whether the cell is a wave
+            if (tileType === "water") {
+                ctx.fillStyle = isWave ? tiles.water.colors[1] : tiles.water.colors[0]; // Use bright red for waves
+            } else {
+                ctx.fillStyle = tiles[tileType].color;
             }
+
+            ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
         }
     }
 }
+
+let wavesEnabled = true; // Waves are enabled by default
+let waveIntervalId; // Stores the interval ID for the wave animation
+
+function toggleWaves() {
+    wavesEnabled = !wavesEnabled; // Toggle the wave state
+
+    const button = document.getElementById("toggleWavesButton");
+    button.textContent = wavesEnabled ? "Disable Waves" : "Enable Waves"; // Update button text
+
+    if (wavesEnabled) {
+        initializeWaves(); // Add initial random waves when re-enabling
+        startWaveAnimation(); // Start waves if enabled
+    } else {
+        clearInterval(waveIntervalId); // Stop the wave animation if disabled
+        waveIntervalId = null; // Clear the interval ID
+
+        // Clear all active waves
+        activeWaves.forEach((row, y) => activeWaves[y] = []); // Reset waves in each row
+        renderGrid(); // Redraw the grid without waves
+    }
+}
+
+
 const activeWaves = Array(gridSize).fill(null).map(() => []); // Array of arrays for each row
 const animationInterval = 200; // Interval in milliseconds for wave movement
 const waveSpawnProbability = 0.1; // Probability of spawning a new wave per row per interval
 
+function initializeWaves() {
+    activeWaves.forEach((row, y) => {
+        activeWaves[y] = []; // Clear any existing waves for a fresh start
+
+        // Add random initial waves to each row
+        for (let x = 0; x < gridSize; x++) {
+            if (grid[y][x].options[0] === "water" && Math.random() < 0.1) { // 10% chance for initial wave
+                activeWaves[y].push(x); // Set this water tile as a wave
+            }
+        }
+    });
+}
+
 function animateWave() {
-    // Move existing waves and spawn new ones
     for (let y = 0; y < gridSize; y++) {
         // Move each wave on the current row
-        for (let i = 0; i < activeWaves[y].length; i++) {
+        for (let i = activeWaves[y].length - 1; i >= 0; i--) { // Loop backwards to safely remove elements
             // Advance each wave one cell to the right
             activeWaves[y][i] += 1;
 
-            // Wrap around if the wave reaches the end of the row
+            // Check if the wave has completed crossing the row
             if (activeWaves[y][i] >= gridSize) {
-                activeWaves[y][i] = 0;
+                activeWaves[y].splice(i, 1); // Remove wave from activeWaves when it reaches the end
+            } else if (activeWaves[y][i] === 0) {
+                // Reset wave color to the base water color if it reaches the start
+                grid[y][0].isWave = false;
             }
         }
 
         // Randomly spawn a new wave on this row
         if (Math.random() < waveSpawnProbability) {
-            activeWaves[y].push(0); // Start new wave at the beginning of the row
+            activeWaves[y].push(0); // Start a new wave at the beginning of the row
         }
     }
 
@@ -314,13 +364,16 @@ function animateWave() {
     renderGrid();
 }
 
-// Start the animation loop for wave movement
-setInterval(animateWave, animationInterval);
+function startWaveAnimation() {
+    if (!wavesEnabled) return; // Do nothing if waves are disabled
 
+    // Clear any existing interval to prevent multiple intervals from stacking
+    if (waveIntervalId) {
+        clearInterval(waveIntervalId);
+    }
 
-function startAnimation() {
-    renderGrid(); // Render the static map first
-    animate(); // Start the wave animation on water cells
+    // Start the animation loop for wave movement
+    waveIntervalId = setInterval(animateWave, animationInterval);
 }
 
 // document.getElementById("toggleGridButton").addEventListener("click", () => {
@@ -328,12 +381,11 @@ function startAnimation() {
 //     renderGrid(); // Re-render to apply grid change
 // });
 
-document.getElementById("treeDensitySlider").addEventListener("input", function () {
-    document.getElementById("treeDensityValue").textContent = this.value + "%";
-});
+document.getElementById("treeDensitySlider").addEventListener("input", function(event) {
+    const densityValue = event.target.value;
 
-document.getElementById("potatoFactorSlider").addEventListener("input", function () {
-    document.getElementById("potatoFactorValue").textContent = this.value + "%";
+    // Use the density value to adjust tree density in your grid
+    updateTreeDensity(densityValue); // Placeholder for the logic that uses tree density
 });
 
 
