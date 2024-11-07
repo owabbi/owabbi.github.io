@@ -15,6 +15,8 @@ const gridSize = 30; // 20x20 grid
 const tileSize = 20; // 20 pixels per tile
 grid = [];
 
+const noiseScale = 0.25; // Random seed for variation
+
 function initializeGridWithAllOptions() {
     grid = Array.from({ length: gridSize }, () =>
         Array.from({ length: gridSize }, () => ({
@@ -56,7 +58,7 @@ function applyPreferences() {
     // Step 2: Set the core (center island area) based on islandSize
     const centerX = Math.floor(gridSize / 2);
     const centerY = Math.floor(gridSize / 2);
-    const maxLandRadius = Math.min(islandSize + 3, Math.floor(gridSize / 2) - 1);
+    const maxLandRadius = Math.min(islandSize + 1, Math.floor(gridSize / 2) - 1);
 
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
@@ -64,18 +66,24 @@ function applyPreferences() {
             const dy = y - centerY;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Core zone - High probability of land
-            if (distance <= islandSize) {
+            // Calculate Perlin noise for this cell
+            const noiseValue = noise.perlin2(x * noiseScale, y * noiseScale);
+
+            // Define thresholds for land and water
+            const landThreshold = 0.2; // Adjust for more or less land
+            const outerWaterThreshold = islandSize + 3;
+
+            // Core zone based on noise value and distance from center
+            if (distance <= islandSize && noiseValue > -landThreshold) {
                 grid[y][x].options = Math.random() < treeDensity ? ["trees"] : ["grass"];
             }
-            // Transition zone - Mixed land types with decreasing probability
-            else if (distance <= maxLandRadius) {
-                const probability = (maxLandRadius - distance) / maxLandRadius;
-                grid[y][x].options = Math.random() < probability ? ["sand", "rocks", "grass"] : ["water"];
+            // Transition zone with noise influence
+            else if (distance <= outerWaterThreshold && noiseValue > -0.3) {
+                grid[y][x].options = ["sand", "grass"];
             }
-            // Beyond transition - Mostly water
+            // Beyond the outer zone - water only
             else {
-                grid[y][x].options = ["water"];
+                grid[y][x].options = Math.random() < 0.01 ? ["rocks"] : ["water"];
             }
         }
     }
@@ -199,7 +207,7 @@ function startCollapse() {
 function initializeMap() {
     initializeGridWithAllOptions();        // Step 1: Empty grid
     applyPreferences();           // Step 3: Apply border and center constraints
-    smoothMap();
+    // smoothMap();
     startCollapse();
 }
 
@@ -270,10 +278,10 @@ function renderGrid(showOptionCount = false) {
     }
 }
 
-document.getElementById("toggleGridButton").addEventListener("click", () => {
-    showGrid = !showGrid;
-    renderGrid(); // Re-render to apply grid change
-});
+// document.getElementById("toggleGridButton").addEventListener("click", () => {
+//     showGrid = !showGrid;
+//     renderGrid(); // Re-render to apply grid change
+// });
 
 document.getElementById("treeDensitySlider").addEventListener("input", function() {
     document.getElementById("treeDensityValue").textContent = this.value + "%";
