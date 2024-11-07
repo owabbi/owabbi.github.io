@@ -1,7 +1,7 @@
 let showGrid = false;
 // Define tiles and constraints
 const tiles = {
-    water: { color: ["#00aaff"], neighbors: ["water", "sand", "rocks"] },
+    water: { color: "#0077cc", neighbors: ["water", "sand", "rocks"] },
     sand: { color: "#ffe680", neighbors: ["sand", "water", "grass"] },
     grass: { color: "#66ff66", neighbors: ["grass", "sand", "trees", "rocks"] },
     trees: { color: "#006600", neighbors: ["trees", "grass", "rocks"] },
@@ -304,7 +304,7 @@ function renderGrid(time = 0) {
             if (tileType === "water" && wavesEnabled) {
                 const baseColor = tiles[tileType].color;
                 const noiseValue = getNoiseValue(x, y, time);
-                ctx.fillStyle = applyNoiseShading(baseColor, noiseValue);
+                ctx.fillStyle = applyNoiseShading(noiseValue);
             } else {
                 ctx.fillStyle = tiles[tileType].color; // Regular color for non-water or if waves are off
             }
@@ -360,80 +360,57 @@ function blendToElevationCanvas() {
 }
 
 //////////////////////////////// Water movement
-function getNoiseValue(x, y, time) {
-    const frequency = 0.1; // Controls the scale of the waves
-    const amplitude = 0.5; // Controls the intensity of brightness changes
-    return amplitude * noise.perlin2(x * frequency, y * frequency + time);
+function getNoiseValue(x, y, time, directionX = 1, directionY = 1) {
+    const frequency = 0.1; // Scale of the waves
+    const amplitude = 0.5; // Intensity of brightness changes
+    return amplitude * noise.perlin2((x + directionX * time) * frequency, (y + directionY * time) * frequency);
 }
 
-function renderWaterAnimation(time) {
-    // Clear the canvas each frame to prevent any unwanted artifacts
-    waterCtx.clearRect(0, 0, waterAnimationCanvas.width, waterAnimationCanvas.height);
+// Adjust color brightness based on noise, blending toward white for a lighter effect
+function applyNoiseShading(noiseValue) {
+    const baseColor = [0, 119, 204]; // Darker blue (#0077cc)
+    const waveColor = [0, 170, 255]; // Lighter blue (#00aaff)
 
-    for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
-            const cell = grid[y][x];
-            const tileType = cell.options[0];
-
-            // Apply noise-based animation effect only on water cells
-            if (tileType === "water") {
-                const baseColor = tiles.water.color; // Use blue color for water
-                const noiseValue = getNoiseValue(x, y, time); // Generate noise for wave effect
-
-                // Adjust color using noise for a subtle wave effect
-                const animatedColor = applyNoiseShading(baseColor, noiseValue);
-
-                // Render the animated water cell on the canvas
-                waterCtx.fillStyle = animatedColor;
-                waterCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-            }
-        }
-    }
-}
-
-// Function to adjust color brightness based on noise
-// Function to adjust color brightness based on noise
-function applyNoiseShading(color, noiseValue) {
-    // Ensure color is in string format
-    if (Array.isArray(color)) {
-        color = color[0]; // Use the first color if it's an array
-    }
-
-    // Parse RGB values from color string (e.g., "#00aaff" or "rgb(0, 170, 255)")
-    let r, g, b;
-    if (color.startsWith('#')) {
-        // Convert hex color to RGB
-        const bigint = parseInt(color.slice(1), 16);
-        r = (bigint >> 16) & 255;
-        g = (bigint >> 8) & 255;
-        b = bigint & 255;
-    } else {
-        // Assume color is already in "rgb(r, g, b)" format
-        const colorMatch = color.match(/\d+/g);
-        [r, g, b] = colorMatch.map(Number);
-    }
-
-    // Adjust brightness based on noise value, scaling between 0.7 and 1.3
-    const brightnessAdjustment = 0.7 + noiseValue * 0.6; // Adjust range for subtler effect
-    r = Math.min(255, Math.floor(r * brightnessAdjustment));
-    g = Math.min(255, Math.floor(g * brightnessAdjustment));
-    b = Math.min(255, Math.floor(b * brightnessAdjustment));
+    // Calculate intermediate color based on noise value
+    const r = Math.floor(baseColor[0] + (waveColor[0] - baseColor[0]) * noiseValue);
+    const g = Math.floor(baseColor[1] + (waveColor[1] - baseColor[1]) * noiseValue);
+    const b = Math.floor(baseColor[2] + (waveColor[2] - baseColor[2]) * noiseValue);
 
     return `rgb(${r},${g},${b})`;
 }
 
 
 
-let time = 0;
 
+
+let time = 0;
+let waveDirection = { x: 1, y: 0 }; // Initial direction (e.g., rightward)
 let waveAnimationFrameId; // To store the animation frame ID for stopping animation
+
+function updateWaveDirection() {
+    // Randomly select a new direction
+    const directions = [
+        { x: 1, y: 0 },    // Right
+        { x: -1, y: 0 },   // Left
+        { x: 0, y: 1 },    // Down
+        { x: 0, y: -1 },   // Up
+        { x: 1, y: 1 },    // Down-right diagonal
+        { x: -1, y: 1 },   // Down-left diagonal
+        { x: 1, y: -1 },   // Up-right diagonal
+        { x: -1, y: -1 }   // Up-left diagonal
+    ];
+    waveDirection = directions[Math.floor(Math.random() * directions.length)];
+}
+
+// Change direction every few seconds
+setInterval(updateWaveDirection, 3000); // Adjust interval as needed
 
 function animateWater() {
     renderGrid(time); // Render the current frame with water animation if enabled
     time += 0.02; // Increase time to create the moving effect
 
     if (wavesEnabled) {
-        waveAnimationFrameId = requestAnimationFrame(animateWater); // Continue animation if waves are enabled
+        waveAnimationFrameId = requestAnimationFrame(() => animateWater()); // Continue animation if waves are enabled
     }
 }
 
