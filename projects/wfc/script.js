@@ -222,40 +222,39 @@ document
 
 // Render the entire grid
 function renderGrid(time = 0) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
 
-    // Draw the land and elevation first
-    for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
-            const cell = grid[y][x];
-            const tileType = cell.options[0];
-            const baseColor = tiles[tileType].color;
+  // Draw the land and elevation first
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const cell = grid[y][x];
+      const tileType = cell.options[0];
+      const baseColor = tiles[tileType].color;
 
-            // Apply wave effect for water cells if waves are enabled
-            if (tileType === "water" && wavesEnabled) {
-                const noiseValue = getNoiseValue(x, y, time);
-                ctx.fillStyle = applyNoiseShading(noiseValue); // Animated wave effect
-            } 
-            // Apply elevation shading only for specific land types: grass, rocks, trees
-            else if (["grass", "rocks", "trees"].includes(tileType)) {
-                const elevationFactor = elevationGrid[y][x].elevation;
-                ctx.fillStyle = applyElevationShading(baseColor, elevationFactor);
-            }
-            // Directly use base color for other tile types (e.g., sand)
-            else {
-                ctx.fillStyle = baseColor;
-            }
+      // Apply wave effect for water cells if waves are enabled
+      if (tileType === "water" && wavesEnabled) {
+        const noiseValue = getNoiseValue(x, y, time);
+        ctx.fillStyle = applyNoiseShading(noiseValue); // Animated wave effect
+      }
+      // Apply elevation shading only for specific land types: grass, rocks, trees
+      else if (["grass", "rocks", "trees"].includes(tileType)) {
+        const elevationFactor = elevationGrid[y][x].elevation;
+        ctx.fillStyle = applyElevationShading(baseColor, elevationFactor);
+      }
+      // Directly use base color for other tile types (e.g., sand)
+      else {
+        ctx.fillStyle = baseColor;
+      }
 
-            ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-        }
+      ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
     }
+  }
 
-    // Draw clouds last if enabled
-    if (cloudsEnabled) {
-        renderCloudLayer(time);
-    }
+  // Draw clouds last if enabled
+  if (cloudsEnabled) {
+    renderCloudLayer(time);
+  }
 }
-
 
 /////////////// Animations
 
@@ -517,33 +516,34 @@ document
 
 // Cloud rendering as a separimate layer on top
 function renderCloudLayer(te) {
-    for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
-            const cloudValue = generateCloudNoise(x, y, time);
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const cloudValue = generateCloudNoise(x, y, time);
 
-            // Only render clouds in the highest regions of the noise
-            if (cloudValue > 0.7) { // Adjust for sparse clouds
-                const alpha = cloudOpacity * (cloudValue - 0.7) * 3.3; // Adjust for opacity control
-                ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(alpha, 1)})`;
-                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-            }
-        }
+      // Only render clouds in the highest regions of the noise
+      if (cloudValue > 0.7) {
+        // Adjust for sparse clouds
+        const alpha = cloudOpacity * (cloudValue - 0.7) * 3.3; // Adjust for opacity control
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(alpha, 1)})`;
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+      }
     }
+  }
 }
-
-
 
 let cloudDirection = 1; // 1 for left-to-right, -1 for right-to-left
 
 function generateCloudNoise(x, y) {
-    const frequency = 0.04; // Fixed frequency for scale
-    const rawNoiseValue = noise.perlin2(x * frequency + cloudTime * cloudDirection, y * frequency); // Apply `cloudTime` to x for horizontal movement
-    return (rawNoiseValue + 1) / 2; // Scale to [0, 1]
+  const frequency = 0.04; // Fixed frequency for scale
+  const rawNoiseValue = noise.perlin2(
+    x * frequency + cloudTime * cloudDirection,
+    y * frequency
+  ); // Apply `cloudTime` to x for horizontal movement
+  return (rawNoiseValue + 1) / 2; // Scale to [0, 1]
 }
 
 let cloudTime = 0;
 let cloudSpeedMultiplier = 0.0005; // Adjust for much slower speed
-
 
 function animateClouds() {
   renderCloudLayer(cloudTime); // Render the cloud layer independently
@@ -551,7 +551,6 @@ function animateClouds() {
 
   requestAnimationFrame(animateClouds); // Loop the cloud animation
 }
-
 
 // Initialize clouds with random direction on map recreation
 function initializeClouds() {
@@ -569,6 +568,98 @@ document
     // Use the density value to adjust tree density in your grid
     updateTreeDensity(densityValue); // Placeholder for the logic that uses tree density
   });
+
+let debugAnimationFrameId;
+let selectedMode = "elevation"; // Default mode
+
+// Listen for changes on the display mode radio inputs
+document.querySelectorAll('input[name="displayMode"]').forEach((radio) => {
+  radio.addEventListener("change", (event) => {
+    selectedMode = event.target.value;
+    updateDebugDisplay(selectedMode);
+  });
+});
+
+// Function to update the debug view based on the selected mode
+function updateDebugDisplay(mode) {
+  // Clear previous animation frame
+  cancelAnimationFrame(debugAnimationFrameId);
+
+  switch (mode) {
+    case "elevation":
+      renderElevationMap(); // Static elevation view
+      break;
+    case "waves":
+      animateWaveDebugView(); // Animated waves
+      break;
+    case "clouds":
+      animateCloudDebugView(); // Animated clouds
+      break;
+    default:
+      console.error("Unknown display mode:", mode);
+  }
+}
+
+// Function to animate waves on elevationCanvas
+function animateWaveDebugView(time = 0) {
+  elevationCtx.clearRect(0, 0, elevationCanvas.width, elevationCanvas.height);
+
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const noiseValue = getNoiseValue(x, y, time); // Same noise function as main screen
+      const shade = Math.floor(255 * (0.5 + 0.5 * noiseValue)); // Normalize to [0, 255]
+      elevationCtx.fillStyle = `rgb(${shade}, ${shade}, 255)`; // Blueish wave effect
+      elevationCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    }
+  }
+
+  debugAnimationFrameId = requestAnimationFrame(() =>
+    animateWaveDebugView(time + 0.04)
+  ); // Keep animating
+}
+
+// Function to animate clouds on elevationCanvas
+function animateCloudDebugView(time = 0) {
+  elevationCtx.clearRect(0, 0, elevationCanvas.width, elevationCanvas.height);
+
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const cloudValue = generateCloudNoise(x, y + time); // Same cloud noise function as main screen
+      const shade = Math.floor(128 + 127 * cloudValue); // Gray scale from light to dark
+      elevationCtx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`; // Shades of gray for clouds
+      elevationCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    }
+  }
+
+  debugAnimationFrameId = requestAnimationFrame(() =>
+    animateCloudDebugView(time + 0.0015)
+  ); // Keep animating
+}
+
+// Function to render wave debug information on elevationCanvas
+function renderWaveDebugView() {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      // Get wave noise value for this tile (assuming getNoiseValue is defined)
+      const noiseValue = getNoiseValue(x, y, time);
+      const shade = Math.floor(255 * (0.5 + 0.5 * noiseValue)); // Normalize to [0, 255]
+      elevationCtx.fillStyle = `rgb(${shade}, ${shade}, 255)`; // Blueish shade for waves
+      elevationCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    }
+  }
+}
+
+// Function to render cloud debug information on elevationCanvas
+function renderCloudDebugView() {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const cloudValue = generateCloudNoise(x, y); // Assuming this function exists
+      const shade = Math.floor(255 * cloudValue); // Normalize to [0, 255]
+      elevationCtx.fillStyle = `rgba(255, 255, 255, ${cloudValue})`; // White clouds with transparency
+      elevationCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    }
+  }
+}
 
 function sendHeight() {
   const height = document.documentElement.scrollHeight - 200;
