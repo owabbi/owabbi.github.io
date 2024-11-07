@@ -536,19 +536,22 @@ function renderCloudLayer(te) {
 let cloudDirection = 1; // 1 for left-to-right, -1 for right-to-left
 
 function generateCloudNoise(x, y) {
-    const frequency = 0.04; // Adjust frequency for cloud scale
-    const rawNoiseValue = noise.perlin2(x * frequency + time, y * frequency);
+    const frequency = 0.04; // Fixed frequency for scale
+    const rawNoiseValue = noise.perlin2(x * frequency + cloudTime * cloudDirection, y * frequency); // Apply `cloudTime` to x for horizontal movement
     return (rawNoiseValue + 1) / 2; // Scale to [0, 1]
 }
 
 let cloudTime = 0;
+let cloudSpeedMultiplier = 0.0005; // Adjust for much slower speed
+
 
 function animateClouds() {
   renderCloudLayer(cloudTime); // Render the cloud layer independently
-  cloudTime += 0.0015; // Adjust time increment for cloud movement speed
+  cloudTime += cloudSpeedMultiplier; // Use multiplier for more controlled increment
 
   requestAnimationFrame(animateClouds); // Loop the cloud animation
 }
+
 
 // Initialize clouds with random direction on map recreation
 function initializeClouds() {
