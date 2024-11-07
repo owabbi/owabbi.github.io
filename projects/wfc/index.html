@@ -3,12 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wfc</title>
 </head>
 
 <body>
-    <canvas id="islandCanvas" width="600" height="600"></canvas>
+    <div id="topContainer">
+        <canvas id="islandCanvas" width="600" height="600"></canvas>
+        <canvas id="elevationCanvas" width="600" height="600"></canvas>
+        
+    </div>
+    <!-- <canvas id="waterAnimationCanvas" width="600" height="600" style="display: hidden;"></canvas> -->
     <br>
     <!-- <button id="toggleGridButton">Toggle Grid</button> -->
     <div>
@@ -19,7 +25,11 @@
         <input type="range" id="islandSize" min="1" max="10" value="4">
 
         <button id="toggleWavesButton" onclick="toggleWaves()">Toggle Waves</button>
+        <button id="mergeToggleButton" onclick="toggleMerge()">Toggle Elevation Merge</button>
+
     </div>
+
+
 
     <button id="recreateMapButton">Recreate Map</button>
 

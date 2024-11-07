@@ -1,0 +1,14 @@
+#topContainer {
+    display: flex;           /* Arrange canvases side-by-side */
+    width: 1600px;
+    margin-bottom: 10px;     /* Space between the top and bottom canvases */
+}
+
+canvas {
+    border: 1px solid black; /* Optional: Border for better visibility */
+}
+
+#waterAnimationCanvas {
+    width: 600px;
+    height: 600px;
+}

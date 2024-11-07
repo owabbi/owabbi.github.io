@@ -1,7 +1,7 @@
 let showGrid = false;
 // Define tiles and constraints
 const tiles = {
-    water: { colors: ["#00aaff", "#99ccff"], neighbors: ["water", "sand", "rocks"] },
+    water: { color: ["#00aaff"], neighbors: ["water", "sand", "rocks"] },
     sand: { color: "#ffe680", neighbors: ["sand", "water", "grass"] },
     grass: { color: "#66ff66", neighbors: ["grass", "sand", "trees", "rocks"] },
     trees: { color: "#006600", neighbors: ["trees", "grass", "rocks"] },
@@ -24,9 +24,14 @@ function initializeGridWithAllOptions() {
     );
 }
 
-
 const canvas = document.getElementById("islandCanvas");
+const elevationCanvas = document.getElementById("elevationCanvas");
 const ctx = canvas.getContext("2d");
+const elevationCtx = elevationCanvas.getContext("2d");
+// const waterAnimationCanvas = document.getElementById("waterAnimationCanvas");
+// const waterCtx = waterAnimationCanvas.getContext("2d");
+
+
 let collapseQueue = [];  // Queue to store cells to collapse
 let autoCollapse = false; // Flag for "Skip All" mode
 
@@ -82,31 +87,6 @@ function applyPreferences() {
             }
         }
     }
-}
-
-function smoothMap() {
-    const newGrid = JSON.parse(JSON.stringify(grid)); // Copy of grid to apply smoothing
-
-    for (let y = 1; y < gridSize - 1; y++) {
-        for (let x = 1; x < gridSize - 1; x++) {
-            const cell = grid[y][x];
-            const neighbors = [
-                grid[y - 1][x], grid[y + 1][x], grid[y][x - 1], grid[y][x + 1]
-            ];
-
-            const waterCount = neighbors.filter(n => n.options[0] === "water").length;
-
-            // If surrounded mostly by water, convert cell to water for smoother transition
-            if (waterCount >= 3) {
-                newGrid[y][x].options = ["water"];
-            }
-            // If surrounded by land, make it less likely to be water
-            else if (waterCount <= 1 && cell.options[0] === "water") {
-                newGrid[y][x].options = ["sand"];
-            }
-        }
-    }
-    grid = newGrid; // Update grid with smoothed version
 }
 
 function updateTreeDensity(densityValue) {
@@ -217,61 +197,19 @@ function startCollapse() {
 
 
 function initializeMap() {
+    const randomSeed = Math.floor(Math.random() * 10000); // Adjust range if needed
+    noise.seed(randomSeed); // Assuming the Perlin noise library has a seed function
+
     initializeGridWithAllOptions();        // Step 1: Empty grid
     applyPreferences();           // Step 3: Apply border and center constraints
-    // smoothMap();
+    generateMapWithElevation();
     startCollapse();
-    initializeWaves();
-    startWaveAnimation();
+    renderElevationMap();
+    animateWater();
 }
 
 // Trigger map recreation with a button click
 document.getElementById("recreateMapButton").addEventListener("click", initializeMap);
-
-
-// // Initialize the grid with preset water borders and allow adjacent cells to be water or sand
-// function initializeBorders(treeDensity = 5, islandSize = 1) {
-//     for (let x = 0; x < gridSize; x++) {
-//         grid[0][x] = { collapsed: true, options: ["water"] };            // Top row
-//         grid[gridSize - 1][x] = { collapsed: true, options: ["water"] }; // Bottom row
-//         grid[x][0] = { collapsed: true, options: ["water"] };            // Left column
-//         grid[x][gridSize - 1] = { collapsed: true, options: ["water"] }; // Right column
-//     }
-
-//     // Set adjacent cells to allow either water or sand
-//     for (let x = 1; x < gridSize - 1; x++) {
-//         grid[1][x].options = ["water", "sand"];             // Second row
-//         grid[gridSize - 2][x].options = ["water", "sand"];  // Second-last row
-//         grid[x][1].options = ["water", "sand"];             // Second column
-//         grid[x][gridSize - 2].options = ["water", "sand"];  // Second-last column
-//     }
-
-//     // Seed the center with grass or trees for island formation
-//     const centerX = Math.floor(gridSize / 2);
-//     const centerY = Math.floor(gridSize / 2);
-//     const maxRadius = Math.min(5, islandSize);
-//     const grassDominanceThreshold = 3;
-
-//     for (let radius = 0; radius < maxRadius; radius++) {
-//         const startX = centerX - 2 - radius;
-//         const endX = centerX + 1 + radius;
-//         const startY = centerY - 2 - radius;
-//         const endY = centerY + 1 + radius;
-
-//         for (let y = startY; y <= endY; y++) {
-//             for (let x = startX; x <= endX; x++) {
-//                 if (x > 1 && x < gridSize - 2 && y > 1 && y < gridSize - 2) {
-//                     // Randomly choose between grass and trees based on treeDensity
-//                     const isDominant = islandSize >= grassDominanceThreshold;
-//                     grid[y][x] = {
-//                         collapsed: false,
-//                         options: isDominant ? ["grass"] : ["grass", "trees"]
-//                     };
-//                 }
-//             }
-//         }
-//     }
-// }
 
 
 // Render the entire grid
@@ -284,19 +222,16 @@ function renderGrid() {
             const tileType = cell.options[0];
 
             // Check if this cell is currently a wave based on activeWaves
-            let isWave = tileType === "water" && Array.isArray(activeWaves[y]) && activeWaves[y].includes(x);
-
             // Choose color based on whether the cell is a wave
-            if (tileType === "water") {
-                ctx.fillStyle = isWave ? tiles.water.colors[1] : tiles.water.colors[0]; // Use bright red for waves
-            } else {
-                ctx.fillStyle = tiles[tileType].color;
-            }
+            ctx.fillStyle = tiles[tileType].color;
+
 
             ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
         }
     }
 }
+
+/////////////// Animations
 
 let wavesEnabled = true; // Waves are enabled by default
 let waveIntervalId; // Stores the interval ID for the wave animation
@@ -308,85 +243,210 @@ function toggleWaves() {
     button.textContent = wavesEnabled ? "Disable Waves" : "Enable Waves"; // Update button text
 
     if (wavesEnabled) {
-        initializeWaves(); // Add initial random waves when re-enabling
-        startWaveAnimation(); // Start waves if enabled
+        animateWater(); // Start the wave animation on the main grid
     } else {
-        clearInterval(waveIntervalId); // Stop the wave animation if disabled
-        waveIntervalId = null; // Clear the interval ID
-
-        // Clear all active waves
-        activeWaves.forEach((row, y) => activeWaves[y] = []); // Reset waves in each row
-        renderGrid(); // Redraw the grid without waves
+        cancelAnimationFrame(waveAnimationFrameId); // Stop the wave animation if disabled
+        renderGrid(); // Render static grid without animation
     }
 }
 
 
-const activeWaves = Array(gridSize).fill(null).map(() => []); // Array of arrays for each row
-const animationInterval = 200; // Interval in milliseconds for wave movement
-const waveSpawnProbability = 0.1; // Probability of spawning a new wave per row per interval
+///////////////////// Elevation map
 
-function initializeWaves() {
-    activeWaves.forEach((row, y) => {
-        activeWaves[y] = []; // Clear any existing waves for a fresh start
+const elevationGrid = Array.from({ length: gridSize }, () =>
+    Array.from({ length: gridSize }, () => ({ elevation: 0 }))
+);
 
-        // Add random initial waves to each row
-        for (let x = 0; x < gridSize; x++) {
-            if (grid[y][x].options[0] === "water" && Math.random() < 0.1) { // 10% chance for initial wave
-                activeWaves[y].push(x); // Set this water tile as a wave
-            }
-        }
-    });
-}
-
-function animateWave() {
+function generateMapWithElevation() {
     for (let y = 0; y < gridSize; y++) {
-        // Move each wave on the current row
-        for (let i = activeWaves[y].length - 1; i >= 0; i--) { // Loop backwards to safely remove elements
-            // Advance each wave one cell to the right
-            activeWaves[y][i] += 1;
+        for (let x = 0; x < gridSize; x++) {
+            // Apply Perlin noise to generate elevation
+            const elevationValue = noise.simplex2(x * 0.1, y * 0.1); // Adjust 0.1 for different scales
+            elevationGrid[y][x].elevation = (elevationValue + 1) / 2; // Normalize to 0-1 range
+        }
+    }
+}
 
-            // Check if the wave has completed crossing the row
-            if (activeWaves[y][i] >= gridSize) {
-                activeWaves[y].splice(i, 1); // Remove wave from activeWaves when it reaches the end
-            } else if (activeWaves[y][i] === 0) {
-                // Reset wave color to the base water color if it reaches the start
-                grid[y][0].isWave = false;
+function renderElevationMap() {
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const elevationFactor = elevationGrid[y][x].elevation;
+
+            // Map elevation to grayscale color: black (low) to white (high)
+            const grayscaleValue = Math.floor(255 * elevationFactor);
+            const color = `rgb(${grayscaleValue},${grayscaleValue},${grayscaleValue})`;
+
+            elevationCtx.fillStyle = color;
+            elevationCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        }
+    }
+}
+
+
+// Function to convert elevation (0 to 1) to a color on a navy-to-red gradient
+function elevationToColor(elevation) {
+    const red = Math.min(255, Math.floor(255 * elevation));
+    const green = Math.min(255, Math.floor(128 * elevation)); // Mid-range intensity for smoother gradient
+    const blue = Math.max(0, Math.floor(255 * (1 - elevation))); // Darker for lower elevations
+    return `rgb(${red},${green},${blue})`;
+}
+
+// Render the elevation map on the secondary canvas
+function renderGrid(time = 0) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
+
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const cell = grid[y][x];
+            const tileType = cell.options[0];
+
+            // Apply animated color effect on water cells if waves are enabled
+            if (tileType === "water" && wavesEnabled) {
+                const baseColor = tiles[tileType].color;
+                const noiseValue = getNoiseValue(x, y, time);
+                ctx.fillStyle = applyNoiseShading(baseColor, noiseValue);
+            } else {
+                ctx.fillStyle = tiles[tileType].color; // Regular color for non-water or if waves are off
+            }
+
+            ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        }
+    }
+}
+
+
+// Call this after generating the elevation values in the main grid
+
+let isMergeEnabled = false; // Track the merge state
+
+function toggleMerge() {
+    isMergeEnabled = !isMergeEnabled;
+
+    if (isMergeEnabled) {
+        renderGrid();           // Draw primary map on the main canvas
+        renderElevationMap();    // Draw grayscale elevation map on the elevation canvas
+        blendToElevationCanvas(); // Blend and display on elevation canvas
+    } else {
+        renderElevationMap();    // Show only the elevation map on elevationCanvas
+    }
+}
+
+
+function blendToElevationCanvas() {
+    const primaryImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const elevationImageData = elevationCtx.getImageData(0, 0, elevationCanvas.width, elevationCanvas.height);
+    const blendedImageData = elevationCtx.createImageData(elevationCanvas.width, elevationCanvas.height);
+
+    for (let i = 0; i < primaryImageData.data.length; i += 4) {
+        // Get RGB values from the primary map
+        const r1 = primaryImageData.data[i];
+        const g1 = primaryImageData.data[i + 1];
+        const b1 = primaryImageData.data[i + 2];
+
+        // Get RGB values from the elevation map
+        const r2 = elevationImageData.data[i];
+        const g2 = elevationImageData.data[i + 1];
+        const b2 = elevationImageData.data[i + 2];
+
+        // Blend colors by averaging each channel
+        blendedImageData.data[i] = Math.floor((r1 + r2) / 2);
+        blendedImageData.data[i + 1] = Math.floor((g1 + g2) / 2);
+        blendedImageData.data[i + 2] = Math.floor((b1 + b2) / 2);
+        blendedImageData.data[i + 3] = 255; // Full opacity
+    }
+
+    // Draw the blended image back onto the elevation canvas
+    elevationCtx.putImageData(blendedImageData, 0, 0);
+}
+
+//////////////////////////////// Water movement
+function getNoiseValue(x, y, time) {
+    const frequency = 0.1; // Controls the scale of the waves
+    const amplitude = 0.5; // Controls the intensity of brightness changes
+    return amplitude * noise.perlin2(x * frequency, y * frequency + time);
+}
+
+function renderWaterAnimation(time) {
+    // Clear the canvas each frame to prevent any unwanted artifacts
+    waterCtx.clearRect(0, 0, waterAnimationCanvas.width, waterAnimationCanvas.height);
+
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const cell = grid[y][x];
+            const tileType = cell.options[0];
+
+            // Apply noise-based animation effect only on water cells
+            if (tileType === "water") {
+                const baseColor = tiles.water.color; // Use blue color for water
+                const noiseValue = getNoiseValue(x, y, time); // Generate noise for wave effect
+
+                // Adjust color using noise for a subtle wave effect
+                const animatedColor = applyNoiseShading(baseColor, noiseValue);
+
+                // Render the animated water cell on the canvas
+                waterCtx.fillStyle = animatedColor;
+                waterCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
             }
         }
-
-        // Randomly spawn a new wave on this row
-        if (Math.random() < waveSpawnProbability) {
-            activeWaves[y].push(0); // Start a new wave at the beginning of the row
-        }
     }
-
-    // Render the grid with the updated wave positions
-    renderGrid();
 }
 
-function startWaveAnimation() {
-    if (!wavesEnabled) return; // Do nothing if waves are disabled
-
-    // Clear any existing interval to prevent multiple intervals from stacking
-    if (waveIntervalId) {
-        clearInterval(waveIntervalId);
+// Function to adjust color brightness based on noise
+// Function to adjust color brightness based on noise
+function applyNoiseShading(color, noiseValue) {
+    // Ensure color is in string format
+    if (Array.isArray(color)) {
+        color = color[0]; // Use the first color if it's an array
     }
 
-    // Start the animation loop for wave movement
-    waveIntervalId = setInterval(animateWave, animationInterval);
+    // Parse RGB values from color string (e.g., "#00aaff" or "rgb(0, 170, 255)")
+    let r, g, b;
+    if (color.startsWith('#')) {
+        // Convert hex color to RGB
+        const bigint = parseInt(color.slice(1), 16);
+        r = (bigint >> 16) & 255;
+        g = (bigint >> 8) & 255;
+        b = bigint & 255;
+    } else {
+        // Assume color is already in "rgb(r, g, b)" format
+        const colorMatch = color.match(/\d+/g);
+        [r, g, b] = colorMatch.map(Number);
+    }
+
+    // Adjust brightness based on noise value, scaling between 0.7 and 1.3
+    const brightnessAdjustment = 0.7 + noiseValue * 0.6; // Adjust range for subtler effect
+    r = Math.min(255, Math.floor(r * brightnessAdjustment));
+    g = Math.min(255, Math.floor(g * brightnessAdjustment));
+    b = Math.min(255, Math.floor(b * brightnessAdjustment));
+
+    return `rgb(${r},${g},${b})`;
 }
 
-// document.getElementById("toggleGridButton").addEventListener("click", () => {
-//     showGrid = !showGrid;
-//     renderGrid(); // Re-render to apply grid change
-// });
 
-document.getElementById("treeDensitySlider").addEventListener("input", function(event) {
+
+let time = 0;
+
+let waveAnimationFrameId; // To store the animation frame ID for stopping animation
+
+function animateWater() {
+    renderGrid(time); // Render the current frame with water animation if enabled
+    time += 0.02; // Increase time to create the moving effect
+
+    if (wavesEnabled) {
+        waveAnimationFrameId = requestAnimationFrame(animateWater); // Continue animation if waves are enabled
+    }
+}
+
+
+//////////////////////////////////////////
+
+document.getElementById("treeDensitySlider").addEventListener("input", function (event) {
     const densityValue = event.target.value;
 
     // Use the density value to adjust tree density in your grid
     updateTreeDensity(densityValue); // Placeholder for the logic that uses tree density
 });
+
 
 
 function sendHeight() {
