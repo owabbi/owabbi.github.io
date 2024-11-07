@@ -246,6 +246,7 @@ function toggleWaves() {
         animateWater(); // Start the wave animation on the main grid
     } else {
         cancelAnimationFrame(waveAnimationFrameId); // Stop the wave animation if disabled
+        isAnimating = false;
         renderGrid(); // Render static grid without animation
     }
 }
@@ -270,16 +271,47 @@ function generateMapWithElevation() {
 function renderElevationMap() {
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
-            const elevationFactor = elevationGrid[y][x].elevation;
+            const cell = grid[y][x];
+            const tileType = cell.options[0];
 
-            // Map elevation to grayscale color: black (low) to white (high)
-            const grayscaleValue = Math.floor(255 * elevationFactor);
-            const color = `rgb(${grayscaleValue},${grayscaleValue},${grayscaleValue})`;
+            // Only apply elevation shading to land tiles
+            if (tileType !== "water") {
+                const elevationFactor = elevationGrid[y][x].elevation;
 
-            elevationCtx.fillStyle = color;
-            elevationCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                // Map elevation to grayscale for land tiles: black (low) to white (high)
+                const grayscaleValue = Math.floor(255 * elevationFactor);
+                const color = `rgb(${grayscaleValue},${grayscaleValue},${grayscaleValue})`;
+
+                elevationCtx.fillStyle = color;
+                elevationCtx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            } else {
+                // Clear any previous elevation on water tiles
+                elevationCtx.clearRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            }
         }
     }
+}
+
+function applyElevationShading(color, elevationFactor) {
+    // Parse the base color to RGB values
+    let r, g, b;
+    if (color.startsWith('#')) {
+        const bigint = parseInt(color.slice(1), 16);
+        r = (bigint >> 16) & 255;
+        g = (bigint >> 8) & 255;
+        b = bigint & 255;
+    } else {
+        const colorMatch = color.match(/\d+/g);
+        [r, g, b] = colorMatch.map(Number);
+    }
+
+    // Scale the color brightness based on elevation factor (e.g., from 0.8 to 1.2)
+    const brightnessAdjustment = 0.8 + elevationFactor * 0.4;
+    r = Math.min(255, Math.floor(r * brightnessAdjustment));
+    g = Math.min(255, Math.floor(g * brightnessAdjustment));
+    b = Math.min(255, Math.floor(b * brightnessAdjustment));
+
+    return `rgb(${r},${g},${b})`;
 }
 
 
@@ -291,7 +323,6 @@ function elevationToColor(elevation) {
     return `rgb(${red},${green},${blue})`;
 }
 
-// Render the elevation map on the secondary canvas
 function renderGrid(time = 0) {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
 
@@ -299,20 +330,29 @@ function renderGrid(time = 0) {
         for (let x = 0; x < gridSize; x++) {
             const cell = grid[y][x];
             const tileType = cell.options[0];
+            const baseColor = tiles[tileType].color;
 
-            // Apply animated color effect on water cells if waves are enabled
+            // Apply wave effect for water cells if waves are enabled
             if (tileType === "water" && wavesEnabled) {
-                const baseColor = tiles[tileType].color;
                 const noiseValue = getNoiseValue(x, y, time);
-                ctx.fillStyle = applyNoiseShading(noiseValue);
-            } else {
-                ctx.fillStyle = tiles[tileType].color; // Regular color for non-water or if waves are off
+                ctx.fillStyle = applyNoiseShading(noiseValue); // Animated wave effect
+            } 
+            // Apply elevation shading only for specific land types: grass, rocks, trees
+            else if (["grass", "rocks", "trees"].includes(tileType)) {
+                const elevationFactor = elevationGrid[y][x].elevation;
+                ctx.fillStyle = applyElevationShading(baseColor, elevationFactor);
+            }
+            // Directly use base color for other tile types (e.g., sand)
+            else {
+                ctx.fillStyle = baseColor;
             }
 
             ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
         }
     }
 }
+
+
 
 
 // Call this after generating the elevation values in the main grid
@@ -386,6 +426,7 @@ function applyNoiseShading(noiseValue) {
 let time = 0;
 let waveDirection = { x: 1, y: 0 }; // Initial direction (e.g., rightward)
 let waveAnimationFrameId; // To store the animation frame ID for stopping animation
+let isAnimating = false;
 
 function updateWaveDirection() {
     // Randomly select a new direction
@@ -406,11 +447,23 @@ function updateWaveDirection() {
 setInterval(updateWaveDirection, 3000); // Adjust interval as needed
 
 function animateWater() {
-    renderGrid(time); // Render the current frame with water animation if enabled
-    time += 0.02; // Increase time to create the moving effect
+    // Only start the animation if it's not already running
+    if (!isAnimating) {
+        isAnimating = true;
+        // Use requestAnimationFrame to keep the animation running smoothly
+        function animationStep() {
+            renderGrid(time); // Render the grid with the animated water effect
+            time += 0.06; // Increase time to control wave speed
 
-    if (wavesEnabled) {
-        waveAnimationFrameId = requestAnimationFrame(() => animateWater()); // Continue animation if waves are enabled
+            if (wavesEnabled) {
+                waveAnimationFrameId = requestAnimationFrame(animationStep); // Continue if waves are enabled
+            } else {
+                cancelAnimationFrame(waveAnimationFrameId); // Stop if waves are disabled
+                isAnimating = false; // Reset animation state
+            }
+        }
+
+        animationStep(); // Start the animation loop
     }
 }
 
