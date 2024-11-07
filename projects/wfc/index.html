@@ -8,21 +8,23 @@
 </head>
 
 <body>
-    <canvas id="islandCanvas" width="400" height="400"></canvas>
+    <canvas id="islandCanvas" width="600" height="600"></canvas>
     <br>
-    <button id="stepButton">Next Step</button>
-    <button id="skipAllButton">Skip All</button>
-    <button id="toggleGridButton">Toggle Grid</button>
+    <!-- <button id="toggleGridButton">Toggle Grid</button> -->
     <div>
-        <label for="treeDensity">Tree Density:</label>
-        <input type="range" id="treeDensity" min="1" max="10" value="5">
-    
+        <label for="treeDensitySlider">Tree Density:</label>
+        <input type="range" id="treeDensitySlider" min="0" max="100" value="50">
+
         <label for="islandSize">Island Size:</label>
-        <input type="range" id="islandSize" min="1" max="5" value="1">
+        <input type="range" id="islandSize" min="1" max="10" value="4">
+
+        <label for="potatoFactorSlider">Potato Factor:</label>
+        <input type="range" id="potatoFactorSlider" min="0" max="100" value="20"> 
+
     </div>
-    
+
     <button id="recreateMapButton">Recreate Map</button>
-    
+
 
     <script src="script.js"></script>
 </body>
