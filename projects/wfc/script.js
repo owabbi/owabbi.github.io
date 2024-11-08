@@ -38,59 +38,53 @@ let collapseQueue = []; // Queue to store cells to collapse
 let autoCollapse = false; // Flag for "Skip All" mode
 
 function applyPreferences() {
-  const sliderElement = document.getElementById("islandSize");
-  const islandSize = parseInt(sliderElement.value, 10); // Parse to ensure it's an integer
-
-  const treeDensitySlider = document.getElementById("treeDensitySlider");
-  const treeDensity = parseInt(treeDensitySlider.value, 10) / 100; // Convert to decimal
-
-  if (isNaN(islandSize)) {
-    console.error("Invalid islandSize from slider. Using default of 3.");
-    return;
-  }
-
-  // Step 1: Set water borders
-  for (let x = 0; x < gridSize; x++) {
-    grid[0][x].options = ["water"];
-    grid[gridSize - 1][x].options = ["water"];
-    grid[x][0].options = ["water"];
-    grid[x][gridSize - 1].options = ["water"];
-  }
-
-  // Step 2: Set the core (center island area) based on islandSize
-  const centerX = Math.floor(gridSize / 2);
-  const centerY = Math.floor(gridSize / 2);
-  const maxLandRadius = Math.min(islandSize + 1, Math.floor(gridSize / 2) - 1);
-
-  for (let y = 0; y < gridSize; y++) {
+    const sliderElement = document.getElementById("islandSize");
+    const islandSize = parseInt(sliderElement.value, 10);
+  
+    const treeDensitySlider = document.getElementById("treeDensitySlider");
+    const treeDensity = parseInt(treeDensitySlider.value, 10) / 100;
+  
+    if (isNaN(islandSize)) {
+      console.error("Invalid islandSize from slider. Using default of 3.");
+      return;
+    }
+  
+    // Set water borders
     for (let x = 0; x < gridSize; x++) {
-      const dx = x - centerX;
-      const dy = y - centerY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      // Calculate Perlin noise for this cell
-      const noiseValue = noise.perlin2(x * noiseScale, y * noiseScale);
-
-      // Define thresholds for land and water
-      const landThreshold = 0.2; // Adjust for more or less land
-      const outerWaterThreshold = islandSize + 3;
-
-      // Core zone based on noise value and distance from center
-      if (distance <= islandSize && noiseValue > -landThreshold) {
-        grid[y][x].options =
-          Math.random() < treeDensity ? ["trees"] : ["grass"];
-      }
-      // Transition zone with noise influence
-      else if (distance <= outerWaterThreshold && noiseValue > -0.3) {
-        grid[y][x].options = ["sand", "grass"];
-      }
-      // Beyond the outer zone - water only
-      else {
-        grid[y][x].options = Math.random() < 0.01 ? ["rocks"] : ["water"];
+      grid[0][x].options = ["water"];
+      grid[gridSize - 1][x].options = ["water"];
+      grid[x][0].options = ["water"];
+      grid[x][gridSize - 1].options = ["water"];
+    }
+  
+    // Set core island area with Perlin noise for irregular shape
+    const centerX = Math.floor(gridSize / 2);
+    const centerY = Math.floor(gridSize / 2);
+  
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+  
+        // Calculate Perlin noise for this cell
+        const noiseValue = noise.perlin2(x * noiseScale, y * noiseScale);
+  
+        // Modify land threshold with noise influence for irregular edges
+        const landThreshold = islandSize + noiseValue * 5; // Adjust `5` for more or less irregularity
+  
+        if (distance <= landThreshold) {
+          // Inside threshold: land cell (trees or grass based on tree density)
+          grid[y][x].options =
+            Math.random() < treeDensity ? ["trees"] : ["grass"];
+        } else {
+          // Outside threshold: water or rocks
+          grid[y][x].options = Math.random() < 0.01 ? ["rocks"] : ["water"];
+        }
       }
     }
   }
-}
+  
 
 function updateTreeDensity(densityValue) {
   // Example logic to place trees based on the new density value
