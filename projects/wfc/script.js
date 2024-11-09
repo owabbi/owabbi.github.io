@@ -12,7 +12,7 @@ const tiles = {
 };
 
 // Grid settings
-const gridSize = 30; // 20x20 grid
+const gridSize = 30; // 30x30 grid
 const tileSize = 20; // 20 pixels per tile
 grid = [];
 
