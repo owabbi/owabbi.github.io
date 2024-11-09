@@ -1,4 +1,4 @@
-// Define the maze grid (10x10 example)
+// Define the maze Map (10x10 example)
 const maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
@@ -21,16 +21,19 @@ const lightSources = [
 
 // Player starting position and direction
 const player = {
-    x: 1,   // Initial position on the grid
-    y: 1,   // Initial position on the grid
+    x: 1,   // Initial position on the Map
+    y: 1,   // Initial position on the Map
     direction: 0 // Direction in radians (0 is north/up, Math.PI/2 is east/right, Math.PI is south/down, 3*Math.PI/2 is west/left)
 };
 
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const gridElement = document.getElementById("editorGrid");
-const gridctx = gridElement.getContext('2d');
+const MapElement = document.getElementById("editorMap");
+const Mapctx = MapElement.getContext('2d');
+const editorCanvas = document.getElementById('editorGrid');
+const editorctx = editorCanvas.getContext('2d');
+
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 
@@ -39,31 +42,41 @@ const FOV = Math.PI / 4; // Field of view (45 degrees)
 const numRays = 100; // Number of rays casted
 const maxDepth = 10; // Max depth of vision
 
-//Grid parameters
-const gridSize = 10; //20x20
-const tileSize = 10;
+//Map parameters
+const MapSize = 10; //20x20
+const maptileSize = 10;
 
-grid = [];
+const editorTileSize = 20;
+
+EditorGrid = [];
 
 function createEmptyGrid() {
-    grid = Array.from({ length: gridSize }, () =>
-        Array.from({ length: gridSize }, () => ({
+    EditorGrid = Array.from({ length: MapSize }, () =>
+        Array.from({ length: MapSize }, () => ({
             value: 0,
         }))
     );
 }
 
-function updateGrid() {
-    for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
-            grid[x][y] = maze[x][y];
+function InitialEditor() {
+    for (let y = 0; y < MapSize; y++) {
+        for (let x = 0; x < MapSize; x++) {
+            EditorGrid[x][y] = maze[x][y];
         }
     }
 }
 
+function updateMaze() {
+    for (let y = 0; y < MapSize; y++) {
+        for (let x = 0; x < MapSize; x++) {
+            maze[x][y] = EditorGrid[x][y];
+        }
+    }   
+}
+
 createEmptyGrid();
 
-updateGrid();
+InitialEditor();
 
 // Render maze and player view on canvas
 function render() {
@@ -73,30 +86,59 @@ function render() {
     render3DView();
 }
 
-function renderGrid() {
-    gridctx.clearRect(0, 0, gridElement.width, gridElement.height);
-    for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
+function renderMap() {
+    Mapctx.clearRect(0, 0, MapElement.width, MapElement.height);
+    for (let y = 0; y < MapSize; y++) {
+        for (let x = 0; x < MapSize; x++) {
             if (maze[y][x] === 1) {
-                gridctx.fillStyle = "red";
-                gridctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize)
+                Mapctx.fillStyle = "grey";
+                Mapctx.fillRect(x * maptileSize, y * maptileSize, maptileSize, maptileSize)
             }
         }
     }
 
     //Draw player position
-    gridctx.fillStyle = "black";
-    gridctx.fillRect(player.x * tileSize , player.y * tileSize, 1, 1);
+    Mapctx.fillStyle = "black";
+    Mapctx.fillRect(player.x * maptileSize, player.y * maptileSize, 1, 1);
 
     //Draw player vision
-    gridctx.fillStyle = "navy";
-    gridctx.beginPath();
-    gridctx.moveTo(player.x * tileSize, player.y * tileSize);
-    gridctx.lineTo((player.x + Math.cos(player.direction)) * tileSize , (player.y+ Math.sin(player.direction)) * tileSize);
-    gridctx.stroke();
+    Mapctx.fillStyle = "blue";
+    Mapctx.beginPath();
+    Mapctx.moveTo(player.x * maptileSize, player.y * maptileSize);
+    Mapctx.lineTo((player.x + Math.cos(player.direction + Math.PI / 8)) * maptileSize, (player.y + Math.sin(player.direction + Math.PI / 8)) * maptileSize);
+    Mapctx.stroke();
+    Mapctx.moveTo(player.x * maptileSize, player.y * maptileSize);
+    Mapctx.lineTo((player.x + Math.cos(player.direction - Math.PI / 8)) * maptileSize, (player.y + Math.sin(player.direction - Math.PI / 8)) * maptileSize);
+    Mapctx.stroke();
 }
 
-renderGrid();
+function renderEditor() {
+    editorctx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+    for (let y = 0; y < MapSize; y++) {
+        for (let x = 0; x < MapSize; x++) {
+            if (EditorGrid[y][x] === 1) {
+                editorctx.fillStyle = "grey";
+                editorctx.fillRect(x * editorTileSize, y * editorTileSize, editorTileSize, editorTileSize)
+            }
+        }
+    }
+    // Draw grid lines
+    editorctx.strokeStyle = "black";
+    for (let y = 0; y <= MapSize; y++) {
+        editorctx.beginPath();
+        editorctx.moveTo(0, y * editorTileSize);
+        editorctx.lineTo(MapSize * editorTileSize, y * editorTileSize);
+        editorctx.stroke();
+    }
+    for (let x = 0; x <= MapSize; x++) {
+        editorctx.beginPath();
+        editorctx.moveTo(x * editorTileSize, 0);
+        editorctx.lineTo(x * editorTileSize, MapSize * editorTileSize);
+        editorctx.stroke();
+    }
+}
+
+renderMap();
 
 // Raycasting function
 function castRay(angle) {
@@ -138,7 +180,7 @@ function castRay(angle) {
 function render3DView() {
     for (let i = 0; i < numRays; i++) {
         const rayAngle = player.direction - FOV / 2 + (i / numRays) * FOV;
-        
+
         // Cast the ray and get the distance and brightness to the wall
         const { distance, brightness } = castRay(rayAngle);
 
@@ -195,8 +237,34 @@ document.addEventListener('keydown', (event) => {
             break;
     }
     render(); // Re-render on each movement
-    renderGrid();
+    renderMap();
 });
 
 // Initial render to display starting view
 render();
+
+renderEditor();
+
+
+// Add click event listener to the editor canvas
+editorCanvas.addEventListener('click', function(event) {
+    // Get the mouse position relative to the canvas
+    const rect = editorCanvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Calculate the tile coordinates based on tile size
+    const tileX = Math.floor(mouseX / editorTileSize);
+    const tileY = Math.floor(mouseY / editorTileSize);
+
+    // Toggle the tile state in the EditorGrid
+    if (tileX >= 0 && tileX < MapSize && tileY >= 0 && tileY < MapSize) {
+        EditorGrid[tileY][tileX] = EditorGrid[tileY][tileX] === 1 ? 0 : 1;  // Toggle between 1 and 0
+
+        // Re-render the editor to show the updated grid
+        renderEditor();
+        updateMaze();
+        renderMap();
+        render();
+    }
+});
