@@ -136,6 +136,15 @@ function renderEditor() {
         editorctx.lineTo(x * editorTileSize, MapSize * editorTileSize);
         editorctx.stroke();
     }
+    // Calculate the player's position in grid coordinates
+    const playerTileX = Math.floor(player.x);
+    const playerTileY = Math.floor(player.y);
+
+    // Render the player's tile if within bounds
+    if (playerTileX >= 0 && playerTileX < MapSize && playerTileY >= 0 && playerTileY < MapSize) {
+        editorctx.fillStyle = "blue";
+        editorctx.fillRect(playerTileX * editorTileSize, playerTileY * editorTileSize, editorTileSize, editorTileSize);
+    }
 }
 
 renderMap();
@@ -220,6 +229,26 @@ function movePlayer(dx, dy) {
     }
 }
 
+function updatePlayerPosition(newX, newY) {
+    // Clear the old player position
+    if (player.x >= 0 && player.x < MapSize && player.y >= 0 && player.y < MapSize) {
+        EditorGrid[player.y][player.x] = 0; // Set the previous position to empty
+    }
+
+    // Set new player position
+    player.x = newX;
+    player.y = newY;
+
+    // Update grid with the player's new position
+    if (player.x >= 0 && player.x < MapSize && player.y >= 0 && player.y < MapSize) {
+        EditorGrid[player.y][player.x] = "P";
+    }
+
+    // Re-render editor to reflect the player's new position
+    renderEditor();
+}
+
+
 // Update player direction and render on keypress
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
@@ -238,6 +267,7 @@ document.addEventListener('keydown', (event) => {
     }
     render(); // Re-render on each movement
     renderMap();
+    renderEditor();
 });
 
 // Initial render to display starting view
