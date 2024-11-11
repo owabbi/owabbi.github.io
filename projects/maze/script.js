@@ -1,7 +1,7 @@
 // Define the maze Map (10x10 example)
 const maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 0, 2, 1, 0, 0, 0, 0, 1],
     [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
     [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
@@ -11,6 +11,11 @@ const maze = [
     [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+
+// Slope data indicating height and direction
+const slopeData = {
+    '3': { direction: 'x', height: 0.5 }, // Slope increases along the x-axis with a height increase of 0.5
+};
 
 // Light sources
 const lightSources = [
@@ -51,27 +56,35 @@ const editorTileSize = 20;
 EditorGrid = [];
 
 function createEmptyGrid() {
-    EditorGrid = Array.from({ length: MapSize }, () =>
-        Array.from({ length: MapSize }, () => ({
-            value: 0,
-        }))
-    );
+    EditorGrid = Array.from({ length: MapSize }, () => Array(MapSize).fill(0));
 }
 
 function InitialEditor() {
     for (let y = 0; y < MapSize; y++) {
         for (let x = 0; x < MapSize; x++) {
-            EditorGrid[x][y] = maze[x][y];
+            EditorGrid[y][x] = maze[y][x];
         }
     }
+    EditorGrid[Math.floor(player.y)][Math.floor(player.x)] = "P";
+}
+
+function updateEditor() {
+    for (let y = 0; y < MapSize; y++) {
+        for (let x = 0; x < MapSize; x++) {
+            if (EditorGrid[y][x] === "P") {
+                EditorGrid[y][x] = 0;
+            }
+        }
+    }
+    EditorGrid[Math.floor(player.y)][Math.floor(player.x)] = "P";
 }
 
 function updateMaze() {
     for (let y = 0; y < MapSize; y++) {
         for (let x = 0; x < MapSize; x++) {
-            maze[x][y] = EditorGrid[x][y];
+            maze[y][x] = EditorGrid[y][x] === "P" ? 0 : EditorGrid[y][x];
         }
-    }   
+    }
 }
 
 createEmptyGrid();
@@ -84,12 +97,32 @@ function render() {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     // Render the 3D view from player perspective
     render3DView();
+    renderMap();
+    renderEditor();
 }
 
 function renderMap() {
     Mapctx.clearRect(0, 0, MapElement.width, MapElement.height);
     for (let y = 0; y < MapSize; y++) {
         for (let x = 0; x < MapSize; x++) {
+
+            let brightness = 0;
+            for (const light of lightSources) {
+                const distToLight = Math.sqrt((x - light.x) ** 2 + (y - light.y) ** 2);
+                if (distToLight < light.range) {
+                    brightness += light.intensity / (distToLight * distToLight);
+                }
+            }
+            brightness = Math.min(brightness, 1); // Cap brightness at 1
+
+            // Set the tile color based on brightness (yellow gradient)
+            const colorValue = Math.floor(255 * brightness);
+            Mapctx.fillStyle = `rgba(255, 255, 0, ${brightness})`; // Adjust alpha based on brightness
+
+            // Draw the tile with light gradient effect
+            Mapctx.fillRect(x * maptileSize, y * maptileSize, maptileSize, maptileSize);
+
+            
             if (maze[y][x] === 1) {
                 Mapctx.fillStyle = "grey";
                 Mapctx.fillRect(x * maptileSize, y * maptileSize, maptileSize, maptileSize)
@@ -118,8 +151,12 @@ function renderEditor() {
         for (let x = 0; x < MapSize; x++) {
             if (EditorGrid[y][x] === 1) {
                 editorctx.fillStyle = "grey";
-                editorctx.fillRect(x * editorTileSize, y * editorTileSize, editorTileSize, editorTileSize)
+            } else if (EditorGrid[y][x] === "P") {
+                editorctx.fillStyle = "blue";
+            } else {
+                editorctx.fillStyle = "white";
             }
+            editorctx.fillRect(x * editorTileSize, y * editorTileSize, editorTileSize, editorTileSize);
         }
     }
     // Draw grid lines
@@ -135,15 +172,6 @@ function renderEditor() {
         editorctx.moveTo(x * editorTileSize, 0);
         editorctx.lineTo(x * editorTileSize, MapSize * editorTileSize);
         editorctx.stroke();
-    }
-    // Calculate the player's position in grid coordinates
-    const playerTileX = Math.floor(player.x);
-    const playerTileY = Math.floor(player.y);
-
-    // Render the player's tile if within bounds
-    if (playerTileX >= 0 && playerTileX < MapSize && playerTileY >= 0 && playerTileY < MapSize) {
-        editorctx.fillStyle = "blue";
-        editorctx.fillRect(playerTileX * editorTileSize, playerTileY * editorTileSize, editorTileSize, editorTileSize);
     }
 }
 
@@ -164,59 +192,67 @@ function castRay(angle) {
         depth += 0.1;
 
         if (x < 0 || x >= maze[0].length || y < 0 || y >= maze.length) {
-            return { distance: maxDepth, brightness: 0 };
+            return { distance: maxDepth, brightness: 0, type: 0 };
         }
 
-        if (maze[Math.floor(y)][Math.floor(x)] === 1) {
-            // Calculate brightness based on light sources
+        const tile = maze[Math.floor(y)][Math.floor(x)];
+        if (tile === 1 || tile === 2) { // Check for full or half wall
             let brightness = 0;
             for (const light of lightSources) {
                 const distToLight = Math.sqrt((x - light.x) ** 2 + (y - light.y) ** 2);
                 if (distToLight < light.range) {
-                    // Inverse-square law for light falloff
                     brightness += light.intensity / (distToLight * distToLight);
                 }
             }
-            brightness = Math.min(brightness, 1); // Cap brightness at 1
-            return { distance: depth, brightness: brightness };
+            brightness = Math.min(brightness, 1);
+            return { distance: depth, brightness: brightness, type: tile }; // Return type for wall (1 for full, 2 for half)
         }
     }
 
-    return { distance: maxDepth, brightness: 0 }; // No wall hit; in the dark
+    return { distance: maxDepth, brightness: 0, type: 0 };
 }
 
-// Render the 3D view using raycasting
 function render3DView() {
     for (let i = 0; i < numRays; i++) {
         const rayAngle = player.direction - FOV / 2 + (i / numRays) * FOV;
 
-        // Cast the ray and get the distance and brightness to the wall
-        const { distance, brightness } = castRay(rayAngle);
+        // Cast the ray and get distance, brightness, and wall type
+        const { distance, brightness, type } = castRay(rayAngle);
 
-        // Calculate wall height based on distance (simple perspective)
-        const wallHeight = (1 / distance) * canvasHeight;
+        // Determine wall height based on distance and wall type
+        const fullWallHeight = (1 / distance) * canvasHeight;
+        const wallHeight = type === 2 ? fullWallHeight * 0.5 : fullWallHeight; // Half height for half walls
 
-        // Calculate wall color based on brightness (closer to black for darker areas)
-        const baseColor = 200; // Base color level for walls
-        const colorValue = Math.floor(baseColor * brightness); // Adjust color based on brightness
-        const color = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
+        // Set color based on wall type: red for half walls for debugging
+        let color;
+        if (type === 2) {
+            color = "red"; // Red for half walls
+        } else {
+            const baseColor = 200;
+            const colorValue = Math.floor(baseColor * brightness);
+            color = `rgb(${colorValue}, ${colorValue}, ${colorValue})`; // Grayscale for regular walls
+        }
 
-        const ceilingColor = `rgb(${150 * brightness}, ${180 * brightness}, ${255 * brightness})`; // Sky-blue ceiling
-        const floorColor = `rgb(${100 * brightness}, ${50 * brightness}, ${0 * brightness})`; // Brownish floor
-
-        // Draw the wall slice for each ray
         ctx.fillStyle = color;
-        ctx.fillRect(i * (canvasWidth / numRays), (canvasHeight - wallHeight) / 2, canvasWidth / numRays, wallHeight);
 
-        // Draw the ceiling
+        // Draw the wall slice:
+        // - Full walls are centered vertically.
+        // - Half walls start from the floor and go halfway up.
+        const yPosition = type === 2
+            ? (canvasHeight + fullWallHeight / 2) / 2  // Anchor half walls to the floor
+            : (canvasHeight - wallHeight) / 2;         // Center full walls vertically
+
+        ctx.fillRect(i * (canvasWidth / numRays), yPosition, canvasWidth / numRays, wallHeight);
+
         ctx.fillStyle = "darkblue";
-        ctx.fillRect(i * (canvasWidth / numRays), 0, canvasWidth / numRays, (canvasHeight - wallHeight) / 2);
+        ctx.fillRect(i * (canvasWidth / numRays), 0, canvasWidth / numRays, yPosition);
 
-        // Draw the floor
         ctx.fillStyle = "darkgreen";
-        ctx.fillRect(i * (canvasWidth / numRays), (canvasHeight + wallHeight) / 2, canvasWidth / numRays, canvasHeight);
+        ctx.fillRect(i * (canvasWidth / numRays), yPosition + wallHeight, canvasWidth / numRays, canvasHeight - (yPosition + wallHeight));
     }
 }
+
+
 
 
 // Movement function that moves player if not blocked
@@ -265,9 +301,8 @@ document.addEventListener('keydown', (event) => {
             player.direction += 0.1;
             break;
     }
+    updateEditor();
     render(); // Re-render on each movement
-    renderMap();
-    renderEditor();
 });
 
 // Initial render to display starting view
@@ -277,7 +312,7 @@ renderEditor();
 
 
 // Add click event listener to the editor canvas
-editorCanvas.addEventListener('click', function(event) {
+editorCanvas.addEventListener('click', function (event) {
     // Get the mouse position relative to the canvas
     const rect = editorCanvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
@@ -287,14 +322,16 @@ editorCanvas.addEventListener('click', function(event) {
     const tileX = Math.floor(mouseX / editorTileSize);
     const tileY = Math.floor(mouseY / editorTileSize);
 
+    if (EditorGrid[tileY][tileX] === "P") {
+        return;
+    }
+
     // Toggle the tile state in the EditorGrid
     if (tileX >= 0 && tileX < MapSize && tileY >= 0 && tileY < MapSize) {
         EditorGrid[tileY][tileX] = EditorGrid[tileY][tileX] === 1 ? 0 : 1;  // Toggle between 1 and 0
 
         // Re-render the editor to show the updated grid
-        renderEditor();
         updateMaze();
-        renderMap();
         render();
     }
 });
